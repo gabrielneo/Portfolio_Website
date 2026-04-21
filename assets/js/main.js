@@ -189,6 +189,19 @@ function initScrollSpy() {
 // the scroll. It does NOT hijack external links.
 function initSmoothAnchors() {
   const supportsScrollSmooth = "scrollBehavior" in document.documentElement.style;
+  const baseUrl = () => window.location.href.split("#")[0];
+  const clearHashSoon = () => {
+    if (!history.replaceState) return;
+    // Let the scroll + focus happen, then clean the URL.
+    // (scrollend isn't widely supported yet; this is a practical compromise.)
+    setTimeout(() => history.replaceState(null, "", baseUrl()), 220);
+  };
+
+  // If the page is loaded with a hash, keep the scroll position but hide the fragment.
+  if (window.location.hash && history.replaceState) {
+    setTimeout(() => history.replaceState(null, "", baseUrl()), 0);
+  }
+
   document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
@@ -202,8 +215,9 @@ function initSmoothAnchors() {
     const behavior = motionOff || !supportsScrollSmooth ? "auto" : "smooth";
 
     target.scrollIntoView({ behavior, block: "start" });
-    // Keep the URL in sync for back/forward & sharing, without a jump.
+    // Briefly reflect the target in the URL (no jump), then hide it.
     if (history.replaceState) history.replaceState(null, "", href);
+    clearHashSoon();
     // Move focus to the target for keyboard users (without re-scrolling).
     const prevTabindex = target.getAttribute("tabindex");
     if (prevTabindex === null) target.setAttribute("tabindex", "-1");
@@ -281,7 +295,7 @@ function injectUtilityClasses() {
 
     /* ---------- Per-section ambient accents ----------
        Native radial-gradient backgrounds on each section. No blur filters,
-       no pseudo-element animations, no will-change — because all of those
+       no pseudo-element animations, no will-change - because all of those
        forced continuous GPU compositing during scroll and tanked frame-rate.
        Radial gradients already fade softly, so visually indistinguishable
        from the blurred version, but effectively free for the compositor. */
@@ -297,7 +311,7 @@ function injectUtilityClasses() {
         radial-gradient(40rem 26rem at 0% 100%, rgba(42, 157, 143, .11), transparent 62%);
     }
 
-    /* Thin top divider between consecutive sections — gentle horizon line. */
+    /* Thin top divider between consecutive sections - gentle horizon line. */
     .section + .section {
       box-shadow: inset 0 1px 0 0 rgba(42, 157, 143, .10);
     }
@@ -423,8 +437,8 @@ function injectUtilityClasses() {
     .glance-label::before { content: "▸"; position: absolute; left: 0; top: 0;
       color: var(--accent-400); font-weight: 400; }
 
-    /* Inline link for data blocks (e.g. Contact dl). Intentionally slim — no
-       padding or min-height — so it sits on the same baseline as sibling
+    /* Inline link for data blocks (e.g. Contact dl). Intentionally slim - no
+       padding or min-height - so it sits on the same baseline as sibling
        text values and keeps the row rhythm tight. */
     .contact-link { color: var(--text-hi); text-decoration: underline; text-underline-offset: 4px;
       text-decoration-color: rgba(42,157,143,.55);
@@ -497,7 +511,7 @@ function injectUtilityClasses() {
       color: var(--text-hi);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.045), var(--elev-1);
       transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease; }
-    /* Subtle gradient sheen on hover (single-axis, low opacity — no blend mode). */
+    /* Subtle gradient sheen on hover (single-axis, low opacity - no blend mode). */
     .pcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
       background: radial-gradient(120% 80% at 100% 0%, rgba(42,157,143,.10), rgba(42,157,143,0) 60%);
       opacity: 0; transition: opacity .25s ease; }
@@ -1086,7 +1100,7 @@ function initCursorTrail({ allowMotion }) {
 async function initThree(allowMotion) {
   const canvas = document.getElementById("hero-canvas");
   if (!canvas) return;
-  // Skip the hero network on small/touch-first screens — it doesn't add much
+  // Skip the hero network on small/touch-first screens - it doesn't add much
   // and can make scroll feel heavy on mid-range phones.
   const smallScreen = window.matchMedia?.("(max-width: 639px)")?.matches ?? false;
   if (smallScreen) {
@@ -1109,7 +1123,7 @@ const PROJECT_DATA = {
     desc: "Tracking milestones, delivery health, and risks across workstreams, and packaging updates into decision-ready dashboards for leadership.",
     problem:
       "With multiple parallel workstreams, leaders needed consistent visibility into milestones, risks, and KPIs. Without a clear governance view, decision-making slows and delivery drift increases.",
-    role: "Project Management Intern — supported program governance, cross-functional coordination, and executive reporting using JIRA and structured status updates.",
+    role: "Project Management Intern - supported program governance, cross-functional coordination, and executive reporting using JIRA and structured status updates.",
     improved: [
       "Maintained milestone, health, and risk tracking across workstreams in JIRA.",
       "Built concise KPI dashboards and executive-ready presentations for regular leadership reviews.",
@@ -1128,7 +1142,7 @@ const PROJECT_DATA = {
     desc: "Supporting requirements gathering and migration validation so client onboarding is accurate, traceable, and low-risk at go-live.",
     problem:
       "ERP onboarding can fail quietly: small data issues or unclear requirements surface after go-live as operational disruption, rework, and support burden.",
-    role: "Associate Consultant Intern — supported requirements gathering, validated migration datasets, and produced functional/technical documentation with internal and external stakeholders.",
+    role: "Associate Consultant Intern - supported requirements gathering, validated migration datasets, and produced functional/technical documentation with internal and external stakeholders.",
     improved: [
       "Validated and reconciled migration datasets using Excel to ensure accuracy during onboarding.",
       "Supported requirements gathering and clarified operational needs with internal/external teams.",
@@ -1148,7 +1162,7 @@ const PROJECT_DATA = {
     desc: "Executing structured test coverage on OutSystems sites and automating repetitive checks to improve QA efficiency and consistency.",
     problem:
       "Manual testing is slow and inconsistent, especially when regression checks repeat across releases. Teams need repeatable coverage without ballooning effort.",
-    role: "Business Analyst Intern (QA) — executed test cases, documented issues with recommendations, and engineered test automation scripts to reduce manual workload.",
+    role: "Business Analyst Intern (QA) - executed test cases, documented issues with recommendations, and engineered test automation scripts to reduce manual workload.",
     improved: [
       "Executed 50+ detailed performance and functional test cases for OutSystems corporate websites.",
       "Logged issues clearly and proposed actionable improvements to strengthen user experience and reliability.",
@@ -1375,7 +1389,7 @@ function initBackToTop() {
 }
 
 // When the Contact section scrolls into view, briefly pulse the primary CTA
-// (Email me) once — a quiet nudge that the page's main action is within
+// (Email me) once - a quiet nudge that the page's main action is within
 // reach. One-shot animation, not infinite; skipped for reduced-motion users.
 function initCtaEmphasis() {
   const contact = document.getElementById("contact");

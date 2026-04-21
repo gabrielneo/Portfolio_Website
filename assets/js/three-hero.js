@@ -35,8 +35,8 @@ function mulberry32(seed) {
 // Colors pulled from the site palette so the background reads as part of the
 // brand, not a generic "tech demo."
 const COLORS = {
-  hub: 0x2a9d8f, // primary accent — stronger nodes
-  orbit: 0xdff3ef, // soft highlight — quieter nodes
+  hub: 0x2a9d8f, // primary accent - stronger nodes
+  orbit: 0xdff3ef, // soft highlight - quieter nodes
   line: 0xdff3ef, // connections
   pulse: 0x7fcdbf, // coordination signal
 };
@@ -65,7 +65,7 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   group.rotation.set(0.05, -0.08, 0);
 
   // ---------- Structure ----------
-  // Hubs positioned in an asymmetric triangle — balanced but not mechanical.
+  // Hubs positioned in an asymmetric triangle - balanced but not mechanical.
   const rnd = mulberry32(42);
   const hubs = [
     { x: -2.9, y: 0.7, z: 0.0, orbits: 6, radius: 1.45, dir: 1, baseAngle: 0 },
@@ -200,7 +200,7 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   };
   updateLinePositions();
 
-  // Pulses: small bright dots that travel along random segments — the
+  // Pulses: small bright dots that travel along random segments - the
   // "signal" metaphor. Kept to 2 so cost stays negligible.
   const PULSE_COUNT = 2;
   const pulses = [];
@@ -279,7 +279,7 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
     state.targetMX = clamp((x - 0.5) * 2, -1, 1);
     state.targetMY = clamp((y - 0.5) * 2, -1, 1);
   }
-  // Only wire pointer parallax when animating — saves a listener otherwise.
+  // Only wire pointer parallax when animating - saves a listener otherwise.
   if (animate) {
     window.addEventListener("pointermove", onPointerMove, { passive: true });
   }
@@ -287,13 +287,13 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   // ---------- Render loop ----------
 
   function step(dt) {
-    // Ease pointer influence — very subtle so the background is never pushy.
+    // Ease pointer influence - very subtle so the background is never pushy.
     state.mouseX = lerp(state.mouseX, state.targetMX, 0.045);
     state.mouseY = lerp(state.mouseY, state.targetMY, 0.045);
     group.rotation.y = 0.05 + state.mouseX * 0.12;
     group.rotation.x = -0.08 - state.mouseY * 0.08;
 
-    // Slow orbit motion — visible only on close inspection.
+    // Slow orbit motion - visible only on close inspection.
     for (let oi = 0; oi < ORBIT_COUNT; oi++) {
       orbits[oi].angle += orbits[oi].angleVel * dt;
     }
@@ -334,7 +334,7 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   if (animate) requestAnimationFrame(loop);
   else renderOnce();
 
-  // Pause when tab hidden or when the hero scrolls out of view — both save
+  // Pause when tab hidden or when the hero scrolls out of view - both save
   // battery on laptops and stop unnecessary GPU work.
   function onVis() {
     if (!animate) return;
