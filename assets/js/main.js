@@ -337,16 +337,24 @@ function injectUtilityClasses() {
     html[data-motion="off"] .chip { transition: none; }
     html[data-motion="off"] .chip:hover { transform: none; }
 
-    .navlink { padding: .5rem .8rem; border-radius: .65rem; font-size: .875rem; font-weight: 500;
-      color: var(--text-lo); transition: background .15s ease, color .15s ease; }
-    .navlink:hover { background: var(--surface-2); color: var(--text-hi); }
-    .navlink[data-active="true"] { background: rgba(42,157,143,.14); color: var(--accent-200); }
-    .navlink:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 3px; background: rgba(42,157,143,.15); }
+    /* ---------- Navbar: calm dark glass (healthtech) ---------- */
+    .navlink { padding: .5rem .8rem; border-radius: .75rem; font-size: .875rem; font-weight: 500;
+      color: #AEB9C6; transition: background .22s ease, color .22s ease, border-color .22s ease; }
+    .navlink:hover { background: rgba(49,208,195,.06); color: #8EF2E8; }
+    .navlink[data-active="true"] { background: rgba(49,208,195,.14); color: #E6EDF3; }
+    .navlink:focus-visible { outline: 2px solid #31D0C3; outline-offset: 3px; background: rgba(49,208,195,.14); }
 
-    .navlink-mobile { display:flex; align-items:center; min-height: 2.75rem; padding: .6rem .9rem; border-radius: .65rem; font-size: .95rem; font-weight: 500; color: var(--text-hi);
-      transition: background .15s ease, color .15s ease; }
-    .navlink-mobile:hover { background: var(--surface-2); }
-    .navlink-mobile:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 2px; background: rgba(42,157,143,.18); }
+    /* Contact as a quiet CTA (desktop + mobile). */
+    .nav-cta { border: 1px solid rgba(49,208,195,.26);
+      background: rgba(49,208,195,.10); color: #E6EDF3;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+    .nav-cta:hover { background: rgba(49,208,195,.16); border-color: rgba(49,208,195,.44); color: #8EF2E8; }
+    .nav-cta:focus-visible { outline: 2px solid #31D0C3; outline-offset: 3px; }
+
+    .navlink-mobile { display:flex; align-items:center; min-height: 2.75rem; padding: .6rem .9rem; border-radius: .75rem; font-size: .95rem; font-weight: 500;
+      color: #E6EDF3; transition: background .22s ease, color .22s ease, border-color .22s ease; }
+    .navlink-mobile:hover { background: rgba(49,208,195,.08); color: #8EF2E8; }
+    .navlink-mobile:focus-visible { outline: 2px solid #31D0C3; outline-offset: 2px; background: rgba(49,208,195,.16); }
 
     /* Small inline links (footer, inside prose). Must stay keyboard-visible. */
     .footer-link { min-height: 2.25rem; display: inline-flex; align-items: center; padding: .35rem .55rem;
@@ -710,8 +718,8 @@ function injectUtilityClasses() {
        the user scrolls. Keeps the hero feeling open on first paint. */
     #siteHeader { transition: background-color .22s ease, box-shadow .22s ease, border-color .22s ease; }
     #siteHeader[data-elevated="true"] {
-      background-color: rgba(13, 19, 27, .86);
-      border-bottom-color: rgba(42, 157, 143, .22);
+      background-color: rgba(8, 18, 32, .90);
+      border-bottom-color: rgba(49, 208, 195, .22);
       box-shadow: 0 16px 40px -28px rgba(0, 0, 0, .8);
     }
     html[data-motion="off"] #siteHeader { transition: none; }
@@ -720,30 +728,30 @@ function injectUtilityClasses() {
     #navProgress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
       pointer-events: none; overflow: hidden; }
     #navProgress > span { display: block; height: 100%; width: 0%;
-      background: linear-gradient(90deg, #2A9D8F, #7FCDBF 70%, rgba(223,243,239,.9));
+      background: linear-gradient(90deg, #31D0C3, #8EF2E8 70%, rgba(230,237,243,.92));
       transform-origin: left center; transition: width .08s linear; }
     html[data-motion="off"] #navProgress > span { transition: none; }
 
     /* Scroll-spy underline on active nav link (desktop). */
     .navlink { position: relative; }
     .navlink::after { content: ""; position: absolute; left: .75rem; right: .75rem; bottom: .25rem;
-      height: 2px; background: #2A9D8F; border-radius: 9999px;
+      height: 2px; background: #31D0C3; border-radius: 9999px;
       transform: scaleX(0); transform-origin: left center; transition: transform .25s ease; }
     .navlink[data-active="true"]::after { transform: scaleX(1); }
-    .navlink[aria-current="location"] { color: rgba(223,243,239,.98); }
+    .navlink[aria-current="location"] { color: #E6EDF3; }
     html[data-motion="off"] .navlink::after { transition: none; }
 
     /* Mobile nav: show a left-side indicator + tinted bg on the active item
        so recruiters scanning on phones can see where they are at a glance. */
     .navlink-mobile { position: relative; padding-left: 1rem; }
     .navlink-mobile::before { content: ""; position: absolute; left: .25rem; top: 50%;
-      width: 3px; height: 1rem; border-radius: 2px; background: #2A9D8F;
+      width: 3px; height: 1rem; border-radius: 2px; background: #31D0C3;
       transform: translateY(-50%) scaleY(0); transform-origin: center;
       transition: transform .2s ease, opacity .2s ease; opacity: 0; }
     .navlink-mobile[data-active="true"]::before,
     .navlink-mobile[aria-current="location"]::before { transform: translateY(-50%) scaleY(1); opacity: 1; }
     .navlink-mobile[data-active="true"],
-    .navlink-mobile[aria-current="location"] { background: rgba(42,157,143,.14); color: rgba(223,243,239,.98); }
+    .navlink-mobile[aria-current="location"] { background: rgba(49,208,195,.14); color: #E6EDF3; }
     html[data-motion="off"] .navlink-mobile::before { transition: none; }
 
     /* ---------- Mobile-first responsive refinements ---------- */
