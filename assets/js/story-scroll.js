@@ -37,11 +37,24 @@ window.initStoryScroll = function initStoryScroll(allowMotion) {
 
   const midpoint = (st) => (st.start + st.end) / 2;
   let scenePickT = 0;
+  const getScrollY = () => {
+    // ScrollTrigger.scroll() isn't available in all builds/versions.
+    // Use the official helper when present, otherwise fall back to window scrollY.
+    try {
+      if (typeof ScrollTrigger.getScrollFunc === "function") {
+        const fn = ScrollTrigger.getScrollFunc(window);
+        if (typeof fn === "function") return fn();
+      }
+    } catch (_) {
+      // ignore
+    }
+    return window.pageYOffset || document.documentElement.scrollTop || 0;
+  };
   const pickActiveScene = () => {
     if (scenePickT) return;
     scenePickT = requestAnimationFrame(() => {
       scenePickT = 0;
-      const y = ScrollTrigger.scroll();
+      const y = getScrollY();
       const viewMid = y + window.innerHeight * 0.5;
       let best = { id: window.__storyScene, d: Number.POSITIVE_INFINITY };
       for (const s of scenes) {
