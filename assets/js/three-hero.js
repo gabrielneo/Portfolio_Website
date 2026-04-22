@@ -41,6 +41,19 @@ const COLORS = {
   pulse: 0x7fcdbf, // coordination signal
 };
 
+function lerpColorHex(a, b, t) {
+  const ar = (a >> 16) & 255;
+  const ag = (a >> 8) & 255;
+  const ab = a & 255;
+  const br = (b >> 16) & 255;
+  const bg = (b >> 8) & 255;
+  const bb = b & 255;
+  const rr = Math.round(lerp(ar, br, t));
+  const rg = Math.round(lerp(ag, bg, t));
+  const rb = Math.round(lerp(ab, bb, t));
+  return (rr << 16) | (rg << 8) | rb;
+}
+
 window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   const THREE = window.THREE;
   if (!THREE) throw new Error("Three.js not loaded");
@@ -256,7 +269,20 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
 
   // ---------- Layout / events ----------
 
-  const state = { w: 1, h: 1, mouseX: 0, mouseY: 0, targetMX: 0, targetMY: 0 };
+  const state = {
+    w: 1,
+    h: 1,
+    mouseX: 0,
+    mouseY: 0,
+    targetMX: 0,
+    targetMY: 0,
+    dragOn: false,
+    dragX: 0,
+    dragY: 0,
+    dragTX: 0,
+    dragTY: 0,
+    energy: 0,
+  };
 
   function setSize() {
     const rect = canvas.getBoundingClientRect();
@@ -272,30 +298,114 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   const ro = new ResizeObserver(() => setSize());
   ro.observe(canvas);
 
-  function onPointerMove(e) {
+  const pointFromEvent = (e) => {
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
+    return { x, y };
+  };
+
+  function onPointerMove(e) {
+    const { x, y } = pointFromEvent(e);
     state.targetMX = clamp((x - 0.5) * 2, -1, 1);
     state.targetMY = clamp((y - 0.5) * 2, -1, 1);
   }
-  // Only wire pointer parallax when animating - saves a listener otherwise.
+
+  function onPointerDown(e) {
+    if (!animate) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    state.dragOn = true;
+    try {
+      canvas.setPointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
+  }
+
+  function onPointerUp(e) {
+    if (!animate) return;
+    state.dragOn = false;
+    try {
+      canvas.releasePointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
+  }
+
+  function onPointerDrag(e) {
+    if (!animate) return;
+    if (!state.dragOn) return;
+    const dx = typeof e.movementX === "number" ? e.movementX : 0;
+    const dy = typeof e.movementY === "number" ? e.movementY : 0;
+    const scale = 1 / Math.max(420, Math.min(window.innerWidth, 1400));
+    state.dragTX = clamp(state.dragTX + dx * scale, -0.16, 0.16);
+    state.dragTY = clamp(state.dragTY + dy * scale, -0.16, 0.16);
+    state.energy = clamp(state.energy + (Math.abs(dx) + Math.abs(dy)) * 0.003, 0, 1);
+  }
+
+  // Only wire pointer interactions when animating - saves listeners otherwise.
   if (animate) {
     window.addEventListener("pointermove", onPointerMove, { passive: true });
+    canvas.addEventListener("pointerdown", onPointerDown, { passive: true });
+    canvas.addEventListener("pointerup", onPointerUp, { passive: true });
+    canvas.addEventListener("pointercancel", onPointerUp, { passive: true });
+    canvas.addEventListener("pointermove", onPointerDrag, { passive: true });
   }
 
   // ---------- Render loop ----------
+
+  const SCENE_STATES = [
+    { id: "hero", hub: COLORS.hub, orbit: COLORS.orbit, line: COLORS.line, pulse: COLORS.pulse, rotZ: 0.09, lineA: 0.13 },
+    { id: "focus", hub: 0x31d0c3, orbit: 0xdff3ef, line: 0xdff3ef, pulse: 0x8ef2e8, rotZ: 0.075, lineA: 0.12 },
+    { id: "skills", hub: 0x2a9d8f, orbit: 0xc7eae3, line: 0xdff3ef, pulse: 0x7fcdbf, rotZ: 0.085, lineA: 0.125 },
+    { id: "projects", hub: 0x31d0c3, orbit: 0xdff3ef, line: 0xdff3ef, pulse: 0x7fcdbf, rotZ: 0.095, lineA: 0.145 },
+    { id: "experience", hub: 0x23897d, orbit: 0xdff3ef, line: 0xdff3ef, pulse: 0xa8ded6, rotZ: 0.07, lineA: 0.115 },
+    { id: "contact", hub: 0x56bbaa, orbit: 0xdff3ef, line: 0xdff3ef, pulse: 0xdff3ef, rotZ: 0.055, lineA: 0.105 },
+  ];
+
+  const applyStoryAmbience = () => {
+    const sp = typeof window.__storyScrollProgress === "number" ? window.__storyScrollProgress : 0;
+    const activeId = typeof window.__storyScene === "string" ? window.__storyScene : "hero";
+    const sceneP =
+      window.__storySceneProgress && typeof window.__storySceneProgress[activeId] === "number"
+        ? window.__storySceneProgress[activeId]
+        : 0;
+
+    const curIdx = Math.max(0, SCENE_STATES.findIndex((s) => s.id === activeId));
+    const cur = SCENE_STATES[curIdx] || SCENE_STATES[0];
+    const next = SCENE_STATES[Math.min(SCENE_STATES.length - 1, curIdx + 1)] || cur;
+
+    // Blend into the next scene as you move through the current one.
+    const t = clamp((sceneP - 0.35) / 0.65, 0, 1);
+    hubMaterial.color.setHex(lerpColorHex(cur.hub, next.hub, t));
+    orbitMaterial.color.setHex(lerpColorHex(cur.orbit, next.orbit, t));
+    lineMaterial.color.setHex(lerpColorHex(cur.line, next.line, t));
+    pulseMaterial.color.setHex(lerpColorHex(cur.pulse, next.pulse, t));
+    lineMaterial.opacity = lerp(cur.lineA, next.lineA, t);
+
+    const rotZ = lerp(cur.rotZ, next.rotZ, t);
+    group.rotation.z = sp * rotZ - 0.03;
+    canvas.style.opacity = String(0.62 + sp * 0.34);
+
+    state.dragX = lerp(state.dragX, state.dragTX, 0.08);
+    state.dragY = lerp(state.dragY, state.dragTY, 0.08);
+    state.dragTX *= 0.965;
+    state.dragTY *= 0.965;
+    state.energy = lerp(state.energy, 0, 0.06);
+  };
 
   function step(dt) {
     // Ease pointer influence - very subtle so the background is never pushy.
     state.mouseX = lerp(state.mouseX, state.targetMX, 0.045);
     state.mouseY = lerp(state.mouseY, state.targetMY, 0.045);
-    group.rotation.y = 0.05 + state.mouseX * 0.12;
-    group.rotation.x = -0.08 - state.mouseY * 0.08;
+    group.rotation.y = 0.05 + state.mouseX * 0.12 + state.dragX * 0.9;
+    group.rotation.x = -0.08 - state.mouseY * 0.08 - state.dragY * 0.7;
+    applyStoryAmbience();
 
     // Slow orbit motion - visible only on close inspection.
     for (let oi = 0; oi < ORBIT_COUNT; oi++) {
-      orbits[oi].angle += orbits[oi].angleVel * dt;
+      const boost = 1 + state.energy * 0.9;
+      orbits[oi].angle += orbits[oi].angleVel * dt * boost;
     }
     writeOrbitPositions();
 
@@ -317,6 +427,7 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
   function renderOnce() {
     // Static composition for reduced-motion: one clean frame, no pulses.
     pulsePoints.visible = false;
+    applyStoryAmbience();
     renderer.render(scene, camera);
   }
 
@@ -333,6 +444,21 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
 
   if (animate) requestAnimationFrame(loop);
   else renderOnce();
+
+  // Static WebGL (e.g. mobile): still follow scroll-linked ambience when GSAP sets __storyScrollProgress.
+  let ambRaf = 0;
+  const onScrollAmbience = () => {
+    if (animate) return;
+    if (ambRaf) return;
+    ambRaf = requestAnimationFrame(() => {
+      ambRaf = 0;
+      applyStoryAmbience();
+      renderer.render(scene, camera);
+    });
+  };
+  if (!animate) {
+    window.addEventListener("scroll", onScrollAmbience, { passive: true });
+  }
 
   // Pause when tab hidden or when the hero scrolls out of view - both save
   // battery on laptops and stop unnecessary GPU work.
@@ -372,6 +498,11 @@ window.initHeroNetwork = async function initHeroNetwork(canvas, { animate }) {
     ro.disconnect();
     visObs.disconnect();
     window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("scroll", onScrollAmbience);
+    canvas.removeEventListener("pointerdown", onPointerDown);
+    canvas.removeEventListener("pointerup", onPointerUp);
+    canvas.removeEventListener("pointercancel", onPointerUp);
+    canvas.removeEventListener("pointermove", onPointerDrag);
     document.removeEventListener("visibilitychange", onVis);
     renderer.dispose();
     hubGeom.dispose();

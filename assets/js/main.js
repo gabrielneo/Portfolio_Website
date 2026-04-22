@@ -288,6 +288,8 @@ function injectUtilityClasses() {
     @media (min-width: 1024px) { .container { padding-inline: 2rem; } }
 
     .section { padding-block: 3rem; position: relative; isolation: isolate; overflow: hidden; }
+    /* Scenes with pinned content must not clip (prevents pin "stick" feel). */
+    .section.scene-pin { overflow: visible; }
     @media (min-width: 640px) { .section { padding-block: 4.5rem; } }
     @media (min-width: 1024px) { .section { padding-block: 5.5rem; } }
     /* Keep actual content above the ambient accents. */
@@ -309,6 +311,27 @@ function injectUtilityClasses() {
       background-image:
         radial-gradient(44rem 28rem at 100% 0%, rgba(127, 205, 191, .08), transparent 62%),
         radial-gradient(40rem 26rem at 0% 100%, rgba(42, 157, 143, .11), transparent 62%);
+    }
+
+    /* ---------- Drag-to-scroll enhancements (premium, subtle) ---------- */
+    [data-drag-scroll] { scrollbar-width: thin; scrollbar-color: rgba(49,208,195,.4) transparent; }
+    [data-drag-scroll]::-webkit-scrollbar { height: 10px; }
+    [data-drag-scroll]::-webkit-scrollbar-thumb {
+      background: rgba(49,208,195,.22);
+      border-radius: 999px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+    [data-drag-scroll][data-overflowing] { cursor: grab; }
+    [data-drag-scroll][data-dragging] { cursor: grabbing; }
+    /* Allow vertical scrolling while enabling horizontal drag. */
+    [data-drag-scroll][data-drag-scroll-axis="x"] { touch-action: pan-y; }
+
+    /* Case studies carousel: keep cards readable and consistent widths on mobile. */
+    .case-carousel { scroll-padding-left: 0.75rem; }
+    @media (max-width: 767px) {
+      .case-carousel { margin-inline: -0.25rem; padding-inline: 0.25rem; }
+      .case-carousel > .case-card { min-width: 84%; max-width: 84%; flex: 0 0 auto; }
     }
 
     /* Thin top divider between consecutive sections - gentle horizon line. */
@@ -743,8 +766,10 @@ function injectUtilityClasses() {
       pointer-events: none; overflow: hidden; }
     #navProgress > span { display: block; height: 100%; width: 0%;
       background: linear-gradient(90deg, #31D0C3, #8EF2E8 70%, rgba(230,237,243,.92));
-      transform-origin: left center; transition: width .08s linear; }
-    html[data-motion="off"] #navProgress > span { transition: none; }
+      transform-origin: left center;
+      /* No width transition: JS updates width from scroll; animating width here fights
+         the compositor and reads as stutter during fast scroll. */
+      transition: none; }
 
     /* Scroll-spy underline on active nav link (desktop). */
     .navlink { position: relative; }
@@ -1100,17 +1125,12 @@ function initCursorTrail({ allowMotion }) {
 async function initThree(allowMotion) {
   const canvas = document.getElementById("hero-canvas");
   if (!canvas) return;
-  // Skip the hero network on small/touch-first screens - it doesn't add much
-  // and can make scroll feel heavy on mid-range phones.
   const smallScreen = window.matchMedia?.("(max-width: 639px)")?.matches ?? false;
-  if (smallScreen) {
-    canvas.style.display = "none";
-    return;
-  }
+  const animate = allowMotion && !smallScreen;
   try {
     const fn = window.initHeroNetwork;
     if (typeof fn !== "function") return;
-    await fn(canvas, { animate: allowMotion });
+    await fn(canvas, { animate });
   } catch {
     // If Three.js fails for any reason, keep the site usable.
   }
@@ -1388,6 +1408,165 @@ function initBackToTop() {
   });
 }
 
+function initDragScrollEnhancements({ allowMotion }) {
+  const els = Array.from(document.querySelectorAll("[data-drag-scroll]"));
+  if (!els.length) return;
+
+  const motionOff = document.documentElement.dataset.motion === "off";
+
+  const enhance = (el) => {
+    const axis = el.getAttribute("data-drag-scroll-axis") || "x";
+    const snapMode = el.getAttribute("data-drag-scroll-snap") || "none";
+    const isX = axis === "x";
+
+    // Make it feel like a control only when it actually overflows.
+    const updateOverflowState = () => {
+      const over = isX ? el.scrollWidth - el.clientWidth : el.scrollHeight - el.clientHeight;
+      el.toggleAttribute("data-overflowing", over > 4);
+    };
+    updateOverflowState();
+    window.addEventListener("resize", updateOverflowState, { passive: true });
+
+    let dragging = false;
+    let moved = false;
+    let start = 0;
+    let startScroll = 0;
+    let last = 0;
+    let lastT = 0;
+    let v = 0;
+    let raf = 0;
+
+    const stopInertia = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      v = 0;
+    };
+
+    const startInertia = () => {
+      if (motionOff || !allowMotion) return;
+      stopInertia();
+      const step = () => {
+        // Friction tuned to feel premium, not "flingy".
+        v *= 0.92;
+        if (Math.abs(v) < 0.1) {
+          raf = 0;
+          if (snapMode === "cards") snapToCard();
+          return;
+        }
+        if (isX) el.scrollLeft -= v;
+        else el.scrollTop -= v;
+        raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+
+    const snapToCard = () => {
+      // Only on small layouts where it's a carousel.
+      if (window.matchMedia?.("(min-width: 768px)")?.matches) return;
+      const cards = Array.from(el.querySelectorAll(".case-card"));
+      if (!cards.length) return;
+      const center = el.scrollLeft + el.clientWidth * 0.5;
+      let best = { x: el.scrollLeft, d: Number.POSITIVE_INFINITY };
+      for (const c of cards) {
+        const cx = c.offsetLeft + c.offsetWidth * 0.5;
+        const d = Math.abs(cx - center);
+        if (d < best.d) best = { x: c.offsetLeft - 12, d };
+      }
+      el.scrollTo({ left: Math.max(0, best.x), behavior: motionOff ? "auto" : "smooth" });
+    };
+
+    const onPointerDown = (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (!el.hasAttribute("data-overflowing")) return;
+      stopInertia();
+      dragging = true;
+      moved = false;
+      el.setAttribute("data-dragging", "true");
+      start = isX ? e.clientX : e.clientY;
+      startScroll = isX ? el.scrollLeft : el.scrollTop;
+      last = start;
+      lastT = performance.now();
+      try {
+        el.setPointerCapture?.(e.pointerId);
+      } catch {
+        // ignore
+      }
+    };
+
+    const onPointerMove = (e) => {
+      if (!dragging) return;
+      const now = performance.now();
+      const cur = isX ? e.clientX : e.clientY;
+      const dx = cur - start;
+
+      if (!moved && Math.abs(dx) > 6) moved = true;
+      const next = startScroll - dx;
+      if (isX) el.scrollLeft = next;
+      else el.scrollTop = next;
+
+      const dt = Math.max(8, now - lastT);
+      v = (cur - last) / dt * 16; // px per frame-ish
+      last = cur;
+      lastT = now;
+    };
+
+    const onPointerUp = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      el.removeAttribute("data-dragging");
+      try {
+        el.releasePointerCapture?.(e.pointerId);
+      } catch {
+        // ignore
+      }
+      if (moved) startInertia();
+      else if (snapMode === "cards") snapToCard();
+    };
+
+    // Prevent accidental click-through when a drag happened.
+    el.addEventListener(
+      "click",
+      (e) => {
+        if (moved) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      },
+      true,
+    );
+
+    // Keyboard support: arrows scroll the carousel when focused.
+    el.addEventListener("keydown", (e) => {
+      if (!el.hasAttribute("data-overflowing")) return;
+      if (!(e.key === "ArrowLeft" || e.key === "ArrowRight")) return;
+      if (!isX) return;
+      const dir = e.key === "ArrowLeft" ? -1 : 1;
+      const delta = Math.max(240, Math.round(el.clientWidth * 0.75));
+      el.scrollBy({ left: dir * delta, behavior: motionOff ? "auto" : "smooth" });
+    });
+
+    // Pointer listeners.
+    el.addEventListener("pointerdown", onPointerDown, { passive: true });
+    el.addEventListener("pointermove", onPointerMove, { passive: true });
+    el.addEventListener("pointerup", onPointerUp, { passive: true });
+    el.addEventListener("pointercancel", onPointerUp, { passive: true });
+
+    // If the user wheel-scrolls horizontally, snap afterwards.
+    let wheelT = 0;
+    el.addEventListener(
+      "scroll",
+      () => {
+        if (snapMode !== "cards") return;
+        window.clearTimeout(wheelT);
+        wheelT = window.setTimeout(() => snapToCard(), 110);
+      },
+      { passive: true },
+    );
+  };
+
+  els.forEach(enhance);
+}
+
 // When the Contact section scrolls into view, briefly pulse the primary CTA
 // (Email me) once - a quiet nudge that the page's main action is within
 // reach. One-shot animation, not infinite; skipped for reduced-motion users.
@@ -1423,8 +1602,10 @@ const allowMotion = setMotionMode();
 initReveal();
 initCursorTrail({ allowMotion });
 initThree(allowMotion);
+if (typeof window.initStoryScroll === "function") window.initStoryScroll(allowMotion);
 initProjectModal();
 initExpandables();
 initBackToTop();
 initCtaEmphasis();
+initDragScrollEnhancements({ allowMotion });
 

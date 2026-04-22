@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth dark">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -196,9 +196,14 @@
           scroll-behavior: auto !important;
         }
       }
-      /* Make canvas ignore pointer events for accessibility. */
+      /* Global WebGL ambience: fixed behind content, never steals input. */
       #hero-canvas {
         pointer-events: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
       }
       /* Subtle grain for warmth (lightweight). */
       .grain::before {
@@ -293,6 +298,7 @@
       <div class="ambient-blob b2"></div>
       <div class="ambient-blob b3"></div>
     </div>
+    <canvas id="hero-canvas" class="fixed inset-0 z-[1] h-full w-full" aria-hidden="true"></canvas>
     <header
       id="siteHeader"
       class="sticky top-0 z-50 border-b border-[rgba(49,208,195,0.16)] bg-[rgba(8,18,32,0.74)] backdrop-blur-lg"
@@ -309,7 +315,6 @@
         </a>
 
         <div class="hidden items-center gap-1 md:flex">
-          <a class="navlink" href="#about">About</a>
           <a class="navlink" href="#focus">Focus</a>
           <a class="navlink" href="#skills">Strengths</a>
           <a class="navlink" href="#projects">Projects</a>
@@ -340,7 +345,6 @@
         class="hidden border-t border-[rgba(49,208,195,0.12)] bg-[rgba(8,18,32,0.86)] backdrop-blur-lg md:hidden"
       >
         <div class="mx-auto grid max-w-6xl gap-1 px-4 py-3 sm:px-6">
-          <a class="navlink-mobile" href="#about">About</a>
           <a class="navlink-mobile" href="#focus">Focus</a>
           <a class="navlink-mobile" href="#skills">Strengths</a>
           <a class="navlink-mobile" href="#projects">Projects</a>
@@ -355,19 +359,12 @@
     </header>
 
     <main id="main" class="relative z-10">
-      <!-- Hero -->
-      <section id="top" class="relative overflow-hidden">
+      <!-- Hero (full-viewport scene) -->
+      <section id="top" data-scene="hero" class="relative z-10 flex min-h-[78svh] flex-col justify-center overflow-hidden">
         <div class="grain absolute inset-0 bg-gradient-to-b from-ink-900 to-ink-900"></div>
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-900/20 via-ink-900/60 to-ink-900/90"></div>
 
-        <div class="absolute inset-0">
-          <canvas id="hero-canvas" class="h-full w-full"></canvas>
-          <!-- Gradient veils the bottom of the canvas for text legibility but
-               stops short of fully opaque so the page-wide ambient still
-               breathes through into the next section. -->
-          <div class="absolute inset-0 bg-gradient-to-b from-ink-900/10 via-ink-900/55 to-ink-900/85"></div>
-        </div>
-
-        <div class="relative mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:gap-10 sm:px-6 sm:py-16 lg:grid-cols-12 lg:items-start lg:gap-x-10 lg:py-24">
+        <div data-scene-inner class="relative mx-auto grid w-full max-w-6xl flex-1 content-center gap-6 px-4 py-10 sm:gap-8 sm:px-6 sm:py-12 lg:grid-cols-12 lg:items-center lg:gap-x-10">
           <!-- Main pitch: chips -> name -> H1 -> intro -> CTAs -> value props -->
           <div class="lg:col-span-7 lg:row-start-1">
             <div class="reveal flex flex-wrap gap-1.5 sm:gap-2">
@@ -391,12 +388,11 @@
               I help teams solve complex service problems and deliver human-centered digital outcomes.
             </h1>
             <p class="reveal mt-3 max-w-2xl text-pretty text-[15px] leading-relaxed text-ink-200 sm:mt-4 sm:text-base md:text-lg">
-              I align stakeholders, clarify requirements, and map real-world workflows so delivery teams can move with confidence.
-              My focus is practical change: fewer handoff errors, clearer decisions, and services that feel safer and easier for both staff and the people they serve.
+              I align stakeholders and workflows so teams ship reliable services with fewer handoff errors.
             </p>
 
             <!-- CTAs moved up on mobile so recruiters can act early. -->
-            <div class="reveal hero-cta mt-5 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
+            <div class="reveal hero-cta mt-4 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
               <a href="#projects" class="btn-primary">View projects</a>
               <a
                 href="https://docs.google.com/document/d/15ioPiwom80qtJWpb9Y6HgfJsoorh8xAx/edit?usp=sharing&ouid=108258252762539080066&rtpof=true&sd=true"
@@ -452,23 +448,124 @@
         </div>
       </section>
 
-      <!-- Featured case studies (proof-first for recruiters) -->
-      <section id="featured" class="section pt-10 sm:pt-14">
-        <div class="container">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div class="reveal inline-flex items-center gap-2 rounded-full border border-ink-700/60 bg-ink-900/40 px-3 py-1 text-xs text-ink-200">
-                <span class="inline-block h-1.5 w-1.5 rounded-full bg-calm-500"></span>
-                Featured case studies
+      <!-- Focus / Mission -->
+      <section id="focus" data-scene="focus" class="section scene-pin flex min-h-[72svh] flex-col justify-center py-10 sm:py-12">
+        <div data-scene-inner class="container">
+          <div class="grid gap-10 lg:grid-cols-12 lg:items-center">
+            <div class="lg:col-span-6">
+              <p class="text-xs font-semibold uppercase tracking-wider text-calm-300">Focus</p>
+              <h2 class="reveal h2 mt-2">What I optimise for</h2>
+              <p class="reveal mt-4 text-ink-700 dark:text-ink-200">
+                I help teams deliver <span class="font-semibold text-ink-900 dark:text-ink-50">reliable, equitable services</span> in health and mission-driven spaces.
+              </p>
+              <div class="reveal mt-6 flex flex-wrap gap-2">
+                <span class="pill">Stakeholder alignment</span>
+                <span class="pill">Requirements gathering</span>
+                <span class="pill">Workflow improvement</span>
+                <span class="pill">Service design thinking</span>
+                <span class="pill">Delivery coordination</span>
+                <span class="pill">Cross-functional collaboration</span>
               </div>
-              <h2 class="reveal h2 mt-3 text-ink-50">Results at a glance</h2>
-              <p class="reveal mt-2 max-w-2xl text-ink-200">Three short examples: challenge, actions, outcome.</p>
             </div>
-            <a href="#projects" class="reveal text-sm font-semibold text-calm-200 underline-offset-4 hover:underline">See all projects →</a>
+            <div class="lg:col-span-6">
+              <div class="reveal panel p-5 sm:p-7">
+                <h3 class="text-base font-semibold">A simple principle</h3>
+                <p class="mt-3 text-ink-700 dark:text-ink-200">
+                  <span class="font-semibold text-ink-900 dark:text-ink-50">Make the next step obvious</span> for the user, the staff member, and the
+                  system. Clarity reduces mistakes, anxiety, and wasted time.
+                </p>
+
+                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div class="mini-card">
+                    <div class="mini-kicker">People</div>
+                    <div class="mini-text">Accessibility &amp; trust by design</div>
+                  </div>
+                  <div class="mini-card">
+                    <div class="mini-kicker">Process</div>
+                    <div class="mini-text">Workflows that reduce friction</div>
+                  </div>
+                  <div class="mini-card">
+                    <div class="mini-kicker">Product</div>
+                    <div class="mini-text">Fit-for-purpose, maintainable</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Strengths / working style (full-viewport) -->
+      <section id="skills" data-scene="skills" class="section scene-pin flex min-h-[72svh] flex-col justify-center py-10 sm:py-12">
+        <div data-scene-inner class="container">
+          <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div class="max-w-3xl">
+              <p class="text-xs font-semibold uppercase tracking-wider text-calm-300">Strengths</p>
+              <h2 class="reveal h2 mt-2">How I show up on delivery teams</h2>
+              <p class="reveal mt-4 text-ink-700 dark:text-ink-200">
+                I bridge <span class="font-semibold text-ink-900 dark:text-ink-50">frontline ops</span> and <span class="font-semibold text-ink-900 dark:text-ink-50">delivery</span> to keep scope, cadence, and decisions clear.
+              </p>
+            </div>
+            <a href="#projects" class="reveal shrink-0 text-sm font-semibold text-calm-200 underline-offset-4 hover:underline">Projects <span aria-hidden="true">→</span></a>
           </div>
 
-          <div class="mt-6 grid gap-4 sm:mt-8 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
-            <a href="#projects" class="reveal case-card group" aria-label="Case study: Digital transformation governance and KPI reporting">
+          <div class="reveal mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="card">
+              <h3 class="card-title">Stakeholder alignment</h3>
+              <p class="card-body">
+                Facilitate discovery with frontline staff, clinicians, and leadership; reconcile conflicting priorities
+                and leave the team with a shared, defensible definition of success.
+              </p>
+            </div>
+            <div class="card">
+              <h3 class="card-title">Requirements &amp; scope clarity</h3>
+              <p class="card-body">
+                Turn interviews and service walkthroughs into user stories, acceptance criteria, and
+                &ldquo;must / should / could&rdquo; prioritization that ends scope debates in sprint planning.
+              </p>
+            </div>
+            <div class="card">
+              <h3 class="card-title">Workflow &amp; service improvement</h3>
+              <p class="card-body">
+                Map as-is and to-be service flows, pinpoint handoff friction, and co-design changes that cut rework,
+                cycle time, and duplicate data capture. Ship quick wins alongside longer-term systems work.
+              </p>
+            </div>
+            <div class="card">
+              <h3 class="card-title">Delivery coordination</h3>
+              <p class="card-body">
+                Keep cross-functional teams moving with clear cadence, visible risks, and lightweight documentation,
+                so engineering, operations, and compliance stay aligned without extra meetings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured projects (first band pins briefly on desktop; grid below scrolls normally) -->
+      <section id="projects" data-scene="projects" class="section scene-pin relative z-10">
+        <div data-scene-inner>
+          <div id="proof-pin" class="container flex min-h-[72svh] flex-col justify-center py-10 sm:py-12">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-ink-700/60 bg-ink-900/40 px-3 py-1 text-xs text-ink-200">
+                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-calm-500"></span>
+                  Featured projects
+                </div>
+                <h2 class="h2 mt-3 text-ink-50">Results at a glance</h2>
+                <p class="mt-2 max-w-2xl text-ink-200">Three quick examples, then detailed cards.</p>
+              </div>
+              <a href="#projectsGrid" class="text-sm font-semibold text-calm-200 underline-offset-4 hover:underline">Jump to project cards →</a>
+            </div>
+
+            <div class="mt-6 case-carousel flex gap-4 overflow-x-auto pb-2 sm:mt-8 sm:gap-5 md:grid md:overflow-visible md:pb-0 md:grid-cols-2 lg:grid-cols-3"
+              data-drag-scroll
+              data-drag-scroll-axis="x"
+              data-drag-scroll-snap="cards"
+              tabindex="0"
+              aria-label="Case studies carousel. Scroll horizontally, or drag on touch/trackpad."
+            >
+            <a href="#projectsGrid" class="reveal case-card group" aria-label="Case study: Digital transformation governance and KPI reporting">
               <div class="case-top">
                 <span class="case-kicker">Program delivery • Digital transformation</span>
                 <span class="case-arrow" aria-hidden="true">→</span>
@@ -493,7 +590,7 @@
               </div>
             </a>
 
-            <a href="#projects" class="reveal case-card group" aria-label="Case study: ERP onboarding, requirements, and data migration quality">
+            <a href="#projectsGrid" class="reveal case-card group" aria-label="Case study: ERP onboarding, requirements, and data migration quality">
               <div class="case-top">
                 <span class="case-kicker">ERP delivery • Requirements &amp; data migration</span>
                 <span class="case-arrow" aria-hidden="true">→</span>
@@ -518,7 +615,7 @@
               </div>
             </a>
 
-            <a href="#projects" class="reveal case-card group" aria-label="Case study: QA execution and automation to reduce manual testing effort">
+            <a href="#projectsGrid" class="reveal case-card group" aria-label="Case study: QA execution and automation to reduce manual testing effort">
               <div class="case-top">
                 <span class="case-kicker">Public sector • QA &amp; test automation</span>
                 <span class="case-arrow" aria-hidden="true">→</span>
@@ -542,161 +639,14 @@
                 <span class="tag">OutSystems</span><span class="tag">Selenium</span><span class="tag">Test cases</span>
               </div>
             </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- About -->
-      <section id="about" class="section">
-        <div class="container">
-          <div class="grid gap-10 lg:grid-cols-12 lg:items-start">
-            <div class="lg:col-span-5">
-              <h2 class="reveal h2">About me</h2>
-              <p class="reveal mt-4 text-ink-700 dark:text-ink-200">
-                I bridge <span class="font-semibold text-ink-900 dark:text-ink-50">frontline operations</span> and <span class="font-semibold text-ink-900 dark:text-ink-50">digital delivery</span>,
-                clarifying requirements, mapping workflows, and aligning stakeholders so teams can ship services that work in practice.
-              </p>
-              <p class="reveal mt-4 text-ink-700 dark:text-ink-200">
-                My job is to <span class="font-semibold text-ink-900 dark:text-ink-50">make the next step obvious</span>: messy service problems become clear decisions,
-                simpler workflows, and a shared definition of done that staff, leadership, and engineering can all defend.
-              </p>
-            </div>
-
-            <div class="lg:col-span-7">
-              <div class="reveal grid gap-4 sm:grid-cols-2">
-                <div class="card">
-                  <h3 class="card-title">Stakeholder alignment</h3>
-                  <p class="card-body">
-                    Facilitate discovery with frontline staff, clinicians, and leadership; reconcile conflicting priorities
-                    and leave the team with a shared, defensible definition of success.
-                  </p>
-                </div>
-                <div class="card">
-                  <h3 class="card-title">Requirements &amp; scope clarity</h3>
-                  <p class="card-body">
-                    Turn interviews and service walkthroughs into user stories, acceptance criteria, and
-                    &ldquo;must / should / could&rdquo; prioritization that ends scope debates in sprint planning.
-                  </p>
-                </div>
-                <div class="card">
-                  <h3 class="card-title">Workflow &amp; service improvement</h3>
-                  <p class="card-body">
-                    Map as-is and to-be service flows, pinpoint handoff friction, and co-design changes that cut rework,
-                    cycle time, and duplicate data capture. Ship quick wins alongside longer-term systems work.
-                  </p>
-                </div>
-                <div class="card">
-                  <h3 class="card-title">Delivery coordination</h3>
-                  <p class="card-body">
-                    Keep cross-functional teams moving with clear cadence, visible risks, and lightweight documentation,
-                    so engineering, operations, and compliance stay aligned without extra meetings.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <!-- Focus / Mission -->
-      <section id="focus" class="section">
-        <div class="container">
-          <div class="grid gap-10 lg:grid-cols-12 lg:items-center">
-            <div class="lg:col-span-6">
-              <h2 class="reveal h2">Career focus</h2>
-              <p class="reveal mt-4 text-ink-700 dark:text-ink-200">
-                I’m aiming for roles where I can help teams deliver <span class="font-semibold text-ink-900 dark:text-ink-50">reliable, equitable services</span>
-                using technology, especially in health, community services, and public-sector adjacent work.
-              </p>
-              <div class="reveal mt-6 flex flex-wrap gap-2">
-                <span class="pill">Stakeholder alignment</span>
-                <span class="pill">Requirements gathering</span>
-                <span class="pill">Workflow improvement</span>
-                <span class="pill">Service design thinking</span>
-                <span class="pill">Delivery coordination</span>
-                <span class="pill">Cross-functional collaboration</span>
-              </div>
-            </div>
-            <div class="lg:col-span-6">
-              <div class="reveal panel p-5 sm:p-7">
-                <h3 class="text-base font-semibold">A simple principle</h3>
-                <p class="mt-3 text-ink-700 dark:text-ink-200">
-                  <span class="font-semibold text-ink-900 dark:text-ink-50">Make the next step obvious</span> for the user, the staff member, and the
-                  system. Clarity reduces mistakes, anxiety, and wasted time.
-                </p>
-                <div class="mt-5 grid gap-3 sm:grid-cols-3">
-                  <div class="mini-card">
-                    <div class="mini-kicker">People</div>
-                    <div class="mini-text">Accessibility &amp; trust by design</div>
-                  </div>
-                  <div class="mini-card">
-                    <div class="mini-kicker">Process</div>
-                    <div class="mini-text">Workflows that reduce friction</div>
-                  </div>
-                  <div class="mini-card">
-                    <div class="mini-kicker">Product</div>
-                    <div class="mini-text">Fit-for-purpose, maintainable</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Skills / Strengths -->
-      <section id="skills" class="section">
-        <div class="container">
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 class="reveal h2">Skills &amp; strengths</h2>
-              <p class="reveal mt-3 max-w-2xl text-ink-700 dark:text-ink-200">
-                A scannable view of how I contribute on a BA/PM team, with concrete examples of what I do in delivery.
-              </p>
-            </div>
-            <a href="#contact" class="reveal self-start text-sm font-semibold text-calm-200 underline-offset-4 hover:underline sm:self-end">Contact me <span aria-hidden="true">→</span></a>
-          </div>
-
-          <div class="reveal mt-6 grid gap-4 sm:mt-8 md:grid-cols-2 lg:grid-cols-3">
-            <div class="card">
-              <h3 class="card-title">Stakeholder alignment &amp; requirements gathering</h3>
-              <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-ink-700 dark:text-ink-200">
-                <li>Run discovery interviews and workshops with frontline staff, clinicians, and leadership</li>
-                <li>Translate conversations into user stories and acceptance criteria the team can defend in planning</li>
-                <li>Reconcile competing priorities with &ldquo;must / should / could&rdquo; framing and explicit trade-offs</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h3 class="card-title">Workflow improvement &amp; service design thinking</h3>
-              <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-ink-700 dark:text-ink-200">
-                <li>Map as-is service flows and pinpoint handoff friction that slows staff and confuses users</li>
-                <li>Co-design to-be workflows that cut rework, cycle time, and duplicate data capture</li>
-                <li>Segment change into quick wins plus a system-level backlog, so delivery stays pragmatic</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h3 class="card-title">Delivery coordination &amp; cross-functional collaboration</h3>
-              <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-ink-700 dark:text-ink-200">
-                <li>Keep backlog grooming, sprint planning, and status updates tight and decision-oriented</li>
-                <li>Surface risks early and mediate between operations, engineering, and compliance</li>
-                <li>Define lightweight KPIs and documentation that keep delivery honest, not busy</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Projects -->
-      <section id="projects" class="section">
-        <div class="container">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 class="reveal h2 text-ink-50">Selected projects</h2>
-              <p class="reveal mt-3 max-w-2xl text-ink-200">
-                Click a card for details. Press <span class="font-semibold text-ink-50">Esc</span> to close.
-              </p>
-            </div>
-          </div>
+          <div class="container border-t border-ink-700/40 py-14 sm:py-16">
+          <h3 id="projectsHeading" class="text-lg font-semibold text-ink-50">Selected projects</h3>
+          <p class="mt-2 max-w-2xl text-sm text-ink-200">
+            Click a card for details. Press <span class="font-semibold text-ink-50">Esc</span> to close.
+          </p>
 
           <div class="mt-6 grid gap-4 sm:mt-8 sm:gap-5 md:grid-cols-2 lg:grid-cols-3" id="projectsGrid">
             <!--
@@ -751,6 +701,7 @@
               </div>
             </button>
           </div>
+          </div>
         </div>
       </section>
 
@@ -796,15 +747,15 @@
       </div>
 
       <!-- Experience / Timeline -->
-      <section id="experience" class="section">
-        <div class="container">
+      <section id="experience" data-scene="experience" class="section scene-pin flex min-h-[72svh] flex-col justify-start py-10 sm:py-12">
+        <div data-scene-inner class="container">
           <h2 class="reveal h2">Experience timeline</h2>
           <p class="reveal mt-3 max-w-2xl text-ink-700 dark:text-ink-200">
-            A recruiter-friendly view of roles and leadership experiences, with outcomes and the delivery practices I used.
+            Roles, outcomes, and the delivery habits I used.
           </p>
 
-          <ol class="mt-6 grid gap-3 sm:mt-8 sm:gap-4">
-            <li class="reveal timeline">
+          <ol class="mt-5 grid gap-3 sm:mt-7 sm:gap-4">
+            <li class="timeline">
               <div class="timeline-dot" aria-hidden="true"></div>
               <div class="timeline-card">
                 <div class="timeline-top">
@@ -836,7 +787,7 @@
                 </div>
               </div>
             </li>
-            <li class="reveal timeline">
+            <li class="timeline">
               <div class="timeline-dot" aria-hidden="true"></div>
               <div class="timeline-card">
                 <div class="timeline-top">
@@ -868,7 +819,7 @@
                 </div>
               </div>
             </li>
-            <li class="reveal timeline">
+            <li class="timeline">
               <div class="timeline-dot" aria-hidden="true"></div>
               <div class="timeline-card">
                 <div class="timeline-top">
@@ -905,19 +856,19 @@
         </div>
       </section>
 
-      <!-- Values -->
-      <section id="values" class="section">
-        <div class="container">
-          <div class="grid gap-10 lg:grid-cols-12">
+      <!-- Values + Contact (combined scene; separate nav anchors) -->
+      <section id="contact" data-scene="contact" class="section scene-pin flex min-h-[72svh] flex-col justify-center py-10 sm:py-12">
+        <div data-scene-inner class="container">
+          <div id="values" class="grid gap-10 lg:grid-cols-12 lg:items-center scroll-mt-24">
             <div class="lg:col-span-5">
-              <h2 class="reveal h2">Why healthtech / social impact</h2>
+              <p class="text-xs font-semibold uppercase tracking-wider text-calm-300">Values</p>
+              <h2 class="reveal h2 mt-2">Why healthtech / social impact</h2>
               <p class="reveal mt-4 text-ink-700 dark:text-ink-200">
-                The best systems feel invisible: they reduce cognitive load, respect privacy, and help people get help quickly.
                 I’m motivated by work that improves <span class="font-semibold text-ink-900 dark:text-ink-50">access, dignity, and reliability</span>.
               </p>
             </div>
             <div class="lg:col-span-7">
-              <div class="reveal grid gap-4 sm:grid-cols-2">
+              <div class="grid gap-4 sm:grid-cols-2">
                 <div class="card">
                   <h3 class="card-title">Trust</h3>
                   <p class="card-body">Design and delivery that protect sensitive information and earn confidence over time.</p>
@@ -937,23 +888,16 @@
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <!-- Contact -->
-      <section id="contact" class="section">
-        <div class="container">
-          <div class="reveal panel p-5 sm:p-7">
+          <div class="mt-10 border-t border-ink-700/40 pt-10 sm:mt-12 sm:pt-12">
+          <div class="reveal panel mx-auto max-w-5xl p-5 sm:p-7">
             <div class="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
               <div class="lg:col-span-7">
                 <h2 class="h2">Contact</h2>
                 <p class="mt-3 max-w-2xl text-ink-700 dark:text-ink-200">
-                  If you’re hiring for BA/PM roles in healthtech or mission-driven teams, the fastest way to reach me
-                  is <span class="font-semibold text-ink-900 dark:text-ink-50">email</span>. I usually reply within a day
-                  and can share a resume, case-study details, or a short intro call.
+                  The fastest way to reach me is <span class="font-semibold text-ink-900 dark:text-ink-50">email</span>. I usually reply within a day.
                 </p>
 
-                <!-- Primary decision point: one obvious action, plus two supporting channels. -->
                 <div class="hero-cta mt-5 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
                   <a id="emailCta" class="btn-primary" href="mailto:yikai.neo.2023@smu.edu.sg" aria-label="Email Neo Yi Kai">Email me</a>
                   <a
@@ -975,8 +919,6 @@
                 </div>
               </div>
 
-              <!-- 2-column grid: labels align left, values share a single x-axis
-                   so Email / Location / Availability read as a clean data block. -->
               <dl class="lg:col-span-5 grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-2.5 text-sm text-ink-300">
                 <dt class="font-semibold text-ink-50">Email</dt>
                 <dd class="min-w-0">
@@ -993,6 +935,7 @@
                 <dd>Open to opportunities</dd>
               </dl>
             </div>
+          </div>
           </div>
         </div>
       </section>
@@ -1029,6 +972,9 @@
     <!-- Three.js (lightweight min build). If it fails to load, the site still works. -->
     <script defer src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script defer src="./assets/js/three-hero.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script defer src="./assets/js/story-scroll.js"></script>
     <script defer src="./assets/js/main.js"></script>
   </body>
 </html>
