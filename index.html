@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark" data-brand="photo">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -304,13 +304,31 @@
       class="sticky top-0 z-50 border-b border-[rgba(49,208,195,0.16)] bg-[rgba(8,18,32,0.74)] backdrop-blur-lg"
     >
       <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6" aria-label="Primary">
-        <a href="#top" class="group inline-flex items-center gap-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-calm-500">
-          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-calm-500 text-white shadow-soft">
-            <span class="text-sm font-semibold tracking-wide">YN</span>
+        <a
+          href="#top"
+          class="brand group inline-flex items-center gap-2.5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-calm-500"
+          aria-label="Go to top"
+        >
+          <span class="brand-badge" aria-hidden="true">
+            <span class="brand-monogram">
+              <span class="brand-m1">N</span><span class="brand-m2">Y</span>
+            </span>
+            <!-- Variant B (optional): replace monogram with profile image.
+                 Swap by adding `data-brand=\"photo\"` to <html> and setting src. -->
+            <img
+              class="brand-photo"
+              src="./Picture_With_Grandma.jpg"
+              alt=""
+              width="40"
+              height="40"
+              loading="lazy"
+              decoding="async"
+            />
           </span>
-          <span class="leading-tight">
-            <span class="block text-sm font-semibold text-[#E6EDF3]">Neo Yi Kai</span>
-            <span class="block text-xs text-[#AEB9C6]">BA / PM • Healthtech & Social Impact</span>
+
+          <span class="brand-text">
+            <span class="brand-name">Neo Yi Kai</span>
+            <span class="brand-sub">BA / PM • Healthtech • Social impact</span>
           </span>
         </a>
 
@@ -320,7 +338,7 @@
           <a class="navlink" href="#projects">Projects</a>
           <a class="navlink" href="#experience">Experience</a>
           <a class="navlink" href="#values">Values</a>
-          <a class="navlink nav-cta" href="#contact">Contact</a>
+          <a class="navlink nav-cta" href="#contactPanel">Contact</a>
         </div>
 
         <div class="flex items-center gap-2">
@@ -350,7 +368,7 @@
           <a class="navlink-mobile" href="#projects">Projects</a>
           <a class="navlink-mobile" href="#experience">Experience</a>
           <a class="navlink-mobile" href="#values">Values</a>
-          <a class="navlink-mobile nav-cta" href="#contact">Contact</a>
+          <a class="navlink-mobile nav-cta" href="#contactPanel">Contact</a>
         </div>
       </nav>
 
@@ -367,16 +385,20 @@
         <div data-scene-inner class="relative mx-auto grid w-full max-w-6xl flex-1 content-center gap-6 px-4 py-10 sm:gap-8 sm:px-6 sm:py-12 lg:grid-cols-12 lg:items-center lg:gap-x-10">
           <!-- Main pitch: chips -> name -> H1 -> intro -> CTAs -> value props -->
           <div class="lg:col-span-7 lg:row-start-1">
-            <div class="reveal flex flex-wrap gap-1.5 sm:gap-2">
+            <div class="hero-reveal inline-flex items-center gap-2 rounded-full border border-ink-700/60 bg-ink-900/35 px-3 py-1 text-xs font-semibold text-ink-200">
+              <span class="inline-block h-1.5 w-1.5 rounded-full bg-calm-500"></span>
+              Outcome-led BA/PM for health and public services
+            </div>
+
+            <div class="hero-reveal mt-4 flex flex-wrap gap-1.5 sm:gap-2">
               <span class="chip">Business Analyst (BA)</span>
               <span class="chip">Project Manager (PM)</span>
               <span class="chip">Healthtech</span>
-              <span class="chip">GovTech</span>
               <span class="chip hidden sm:inline-flex">Nonprofit / Social Impact</span>
               <span class="chip hidden sm:inline-flex">Digital transformation</span>
             </div>
 
-            <div class="reveal mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-ink-200 sm:mt-6 sm:gap-x-3 sm:gap-y-2">
+            <div class="hero-reveal mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-ink-200 sm:mt-5 sm:gap-x-3 sm:gap-y-2">
               <span class="font-semibold text-ink-50">Neo Yi Kai</span>
               <span class="opacity-60">•</span>
               <span>Business Analyst / Project Manager</span>
@@ -384,43 +406,50 @@
               <span class="block w-full text-calm-200 sm:inline sm:w-auto">Healthtech &amp; mission-driven delivery</span>
             </div>
 
-            <h1 class="reveal mt-3 text-balance text-[1.75rem] font-semibold leading-[1.15] tracking-tight text-ink-50 sm:mt-4 sm:text-4xl md:text-5xl">
-              I help teams solve complex service problems and deliver human-centered digital outcomes.
+            <h1 class="hero-reveal mt-3 text-balance text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-ink-50 sm:mt-4 sm:text-4xl md:text-5xl">
+              I turn messy service needs into clear requirements, aligned teams, and measurable delivery outcomes.
             </h1>
-            <p class="reveal mt-3 max-w-2xl text-pretty text-[15px] leading-relaxed text-ink-200 sm:mt-4 sm:text-base md:text-lg">
-              I align stakeholders and workflows so teams ship reliable services with fewer handoff errors.
+            <p class="hero-reveal mt-3 max-w-2xl text-pretty text-[15px] leading-relaxed text-ink-200 sm:mt-4 sm:text-base md:text-lg">
+              Focus: healthtech and social impact. Style: calm systems thinking, fast execution, low-drama delivery.
             </p>
 
             <!-- CTAs moved up on mobile so recruiters can act early. -->
-            <div class="reveal hero-cta mt-4 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
-              <a href="#projects" class="btn-primary">View projects</a>
+            <div class="hero-reveal hero-cta mt-4 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
+              <a href="#projects" class="btn-primary btn-primary--hero">View projects</a>
               <a
                 href="https://docs.google.com/document/d/15ioPiwom80qtJWpb9Y6HgfJsoorh8xAx/edit?usp=sharing&ouid=108258252762539080066&rtpof=true&sd=true"
                 class="btn-secondary"
                 >Resume</a
               >
-              <a href="#contact" class="btn-tertiary">Contact</a>
+              <a href="#contactPanel" class="btn-tertiary">Contact</a>
             </div>
           </div>
 
           <!-- At a glance: appears after pitch on mobile, right column on desktop. -->
           <aside class="lg:col-span-5 lg:col-start-8 lg:row-start-1" aria-labelledby="heroAtAGlance">
-            <div class="reveal panel p-5 sm:p-6 lg:backdrop-blur">
-              <h3 id="heroAtAGlance" class="text-base font-semibold tracking-tight text-ink-50">At a glance</h3>
-              <!-- 2-column grid mirrors the Contact block: labels auto-size to
-                   the widest ("Strengths"); values share a single left edge. -->
-              <dl class="mt-4 grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-3 text-sm text-ink-200">
-                <dt class="glance-label">Role fit</dt>
-                <dd>BA / PM • discovery → delivery • cross-functional alignment</dd>
+            <div class="hero-reveal panel p-5 sm:p-6 lg:backdrop-blur">
+              <h3 id="heroAtAGlance" class="text-base font-semibold tracking-tight text-ink-50">Executive summary</h3>
+              <p class="mt-2 text-sm text-ink-200">
+                BA/PM who keeps delivery calm: clear scope, visible risks, and decision-ready updates.
+              </p>
 
-                <dt class="glance-label">Sectors</dt>
-                <dd>digital health, public services, social impact, nonprofit tech</dd>
-
-                <dt class="glance-label">Strengths</dt>
-                <dd>stakeholder alignment, requirements gathering, workflow improvement, delivery coordination</dd>
-
-                <dt class="glance-label">Location</dt>
-                <dd>Singapore • open to hybrid / remote</dd>
+              <dl class="mt-4 grid grid-cols-1 gap-3 text-sm text-ink-200">
+                <div class="glance-row">
+                  <dt class="glance-label">Role fit</dt>
+                  <dd class="glance-value">Discovery → delivery • cross-functional alignment</dd>
+                </div>
+                <div class="glance-row">
+                  <dt class="glance-label">Sectors</dt>
+                  <dd class="glance-value">Health, public services, mission-driven teams</dd>
+                </div>
+                <div class="glance-row">
+                  <dt class="glance-label">Strengths</dt>
+                  <dd class="glance-value">Requirements, workflow mapping, governance, QA discipline</dd>
+                </div>
+                <div class="glance-row">
+                  <dt class="glance-label">Location</dt>
+                  <dd class="glance-value">Singapore • hybrid / remote</dd>
+                </div>
               </dl>
 
               <!--
@@ -440,12 +469,17 @@
                   >LinkedIn</a
                 >
                 <span aria-hidden="true" class="opacity-40">·</span>
-                <a class="aside-link" href="mailto:yikai.neo.2023@smu.edu.sg" aria-label="Send Neo an email">Email</a>
+                <a class="aside-link" href="mailto:neoyikai3@gmail.com" aria-label="Send Neo an email">Email</a>
               </p>
             </div>
           </aside>
 
         </div>
+
+        <a href="#focus" class="hero-scroll-hint" aria-label="Scroll to the next section">
+          <span class="hero-scroll-pill">Scroll</span>
+          <span class="hero-scroll-dot" aria-hidden="true"></span>
+        </a>
       </section>
 
       <!-- Focus / Mission -->
@@ -919,7 +953,7 @@
             </div>
           </div>
 
-          <div class="mt-10 border-t border-ink-700/40 pt-10 sm:mt-12 sm:pt-12">
+          <div id="contactPanel" class="mt-10 border-t border-ink-700/40 pt-10 sm:mt-12 sm:pt-12 scroll-mt-24">
           <div class="reveal panel mx-auto max-w-5xl p-5 sm:p-7">
             <div class="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
               <div class="lg:col-span-7">
@@ -929,7 +963,7 @@
                 </p>
 
                 <div class="hero-cta mt-5 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
-                  <a id="emailCta" class="btn-primary" href="mailto:yikai.neo.2023@smu.edu.sg" aria-label="Email Neo Yi Kai">Email me</a>
+                  <a id="emailCta" class="btn-primary" href="mailto:neoyikai3@gmail.com" aria-label="Email Neo Yi Kai">Email me</a>
                   <a
                     class="btn-secondary"
                     href="https://www.linkedin.com/in/neo-yi-kai/"
@@ -952,7 +986,7 @@
               <dl class="lg:col-span-5 grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-2.5 text-sm text-ink-300">
                 <dt class="font-semibold text-ink-50">Email</dt>
                 <dd class="min-w-0">
-                  <a class="contact-link" href="mailto:yikai.neo.2023@smu.edu.sg" aria-label="Email Neo Yi Kai">yikai.neo.2023@smu.edu.sg</a>
+                  <a class="contact-link" href="mailto:neoyikai3@gmail.com" aria-label="Email Neo Yi Kai">neoyikai3@gmail.com</a>
                 </dd>
 
                 <dt class="font-semibold text-ink-50">Mobile</dt>
@@ -975,7 +1009,7 @@
       <div class="container flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p>© <span id="year"></span> Neo Yi Kai. Built as a fast, accessible static site.</p>
         <nav aria-label="Footer" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <a class="footer-link" href="#contact">Contact</a>
+          <a class="footer-link" href="#contactPanel">Contact</a>
           <span class="opacity-50" aria-hidden="true">•</span>
           <a
             class="footer-link"

@@ -164,14 +164,19 @@ function initScrollSpy() {
     }
 
     const offset = getOffset();
-    // Start with nothing active so the hero doesn't force "About" to glow.
-    let activeId = null;
+    // Pick the section whose top is closest to the header offset line.
+    // This updates earlier than the "top crossed" rule, which can feel late
+    // when sections are shorter and crossfading.
+    let best = { id: null, d: Number.POSITIVE_INFINITY };
     for (const { id, el } of sections) {
-      const top = el.getBoundingClientRect().top;
-      if (top - offset <= 0) activeId = id;
-      else break;
+      const rect = el.getBoundingClientRect();
+      // Only consider sections that are meaningfully in view.
+      if (rect.bottom <= offset + 8) continue;
+      if (rect.top >= viewportH * 0.82) continue;
+      const d = Math.abs(rect.top - offset);
+      if (d < best.d) best = { id, d };
     }
-    setActive(activeId);
+    setActive(best.id);
   };
   const onScroll = () => {
     if (ticking) return;
@@ -374,6 +379,51 @@ function injectUtilityClasses() {
     html[data-motion="off"] .chip { transition: none; }
     html[data-motion="off"] .chip:hover { transform: none; }
 
+    /* ---------- Brand identity block (navbar left) ---------- */
+    .brand { min-height: 44px; padding: .25rem .35rem; transition: transform .15s ease; }
+    .brand:hover { transform: translateY(-1px); }
+    html[data-motion="off"] .brand { transition: none; }
+    html[data-motion="off"] .brand:hover { transform: none; }
+
+    .brand-text { display: grid; line-height: 1.05; }
+    .brand-name { font-size: .92rem; font-weight: 700; letter-spacing: -0.015em; color: #E6EDF3; }
+    .brand-sub { margin-top: .12rem; font-size: .72rem; color: rgba(174,185,198,.95); letter-spacing: .01em; }
+
+    .brand-badge { position: relative; width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center;
+      background: radial-gradient(circle at 30% 25%, rgba(49,208,195,.35), rgba(42,157,143,.18) 40%, rgba(8,18,32,.55) 72%),
+                  linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0));
+      border: 1px solid rgba(49,208,195,.24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 14px 40px -26px rgba(49,208,195,.55);
+      overflow: hidden;
+    }
+
+    .brand-badge::before { content: \"\"; position: absolute; inset: -10px; border-radius: 999px;
+      background: radial-gradient(circle at 50% 50%, rgba(49,208,195,.22), rgba(49,208,195,0) 62%);
+      filter: blur(2px); opacity: .95; }
+
+    .brand-badge::after { content: \"\"; position: absolute; inset: -6px; border-radius: 999px;
+      border: 1px solid rgba(49,208,195,.18);
+      box-shadow: 0 0 0 1px rgba(223,243,239,.05);
+      mask: radial-gradient(circle at 50% 50%, transparent 58%, #000 60%);
+      opacity: .8;
+      animation: brandRing 7.5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes brandRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .brand-badge::after { animation: none; } }
+    html[data-motion=\"off\"] .brand-badge::after { animation: none; }
+
+    .brand-monogram { position: relative; z-index: 1; font-weight: 800; letter-spacing: -0.06em;
+      font-size: .95rem; line-height: 1; display: inline-flex; }
+    .brand-m1 { color: rgba(230,237,243,.96); text-shadow: 0 8px 22px rgba(0,0,0,.35); }
+    .brand-m2 { margin-left: -0.12rem; color: rgba(142,242,232,.96); text-shadow: 0 10px 24px rgba(49,208,195,.18); }
+
+    /* Variant B: profile photo in the same badge (off by default). */
+    .brand-photo { position: absolute; inset: 4px; border-radius: 12px; width: calc(100% - 8px); height: calc(100% - 8px);
+      object-fit: cover; display: none; z-index: 1; filter: saturate(1.02) contrast(1.02); }
+    html[data-brand=\"photo\"] .brand-monogram { display: none; }
+    html[data-brand=\"photo\"] .brand-photo { display: block; }
+
     /* ---------- Navbar: calm dark glass (healthtech) ---------- */
     .navlink { padding: .5rem .8rem; border-radius: .75rem; font-size: .875rem; font-weight: 500;
       color: #AEB9C6; transition: background .22s ease, color .22s ease, border-color .22s ease; }
@@ -413,6 +463,10 @@ function injectUtilityClasses() {
     .btn-primary:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 3px; }
     html[data-motion="off"] .btn-primary { transition: none; }
     html[data-motion="off"] .btn-primary:hover { transform: none; }
+
+    /* Hero primary CTA: slightly larger and more dominant. */
+    .btn-primary--hero { min-height: 3rem; padding: .78rem 1.25rem; border-radius: 1rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 18px 40px -18px rgba(42,157,143,.7); }
 
     /* Secondary: glassy outline. Feels light, supporting. */
     .btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap: .4rem;
@@ -742,6 +796,30 @@ function injectUtilityClasses() {
       transition: max-height .24s ease, opacity .22s ease; }
     #mobileMenu[data-open="true"] { max-height: 28rem; opacity: 1; }
     html[data-motion="off"] #mobileMenu { transition: none; }
+
+    /* ---------- Hero: executive-summary polish ---------- */
+    .glance-row { display: grid; grid-template-columns: auto 1fr; gap: .75rem; align-items: baseline; }
+    .glance-label { color: rgba(230,237,243,.72); font-weight: 600; font-size: .78rem; letter-spacing: .02em; text-transform: uppercase; }
+    .glance-value { color: rgba(230,237,243,.92); }
+    .hero-metric { display:inline-flex; align-items:center; gap: .45rem; padding: .35rem .6rem;
+      border-radius: 9999px; border: 1px solid rgba(49,208,195,.18); background: rgba(8,18,32,.38);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+    .hero-metric-k { color: rgba(142,242,232,.92); font-weight: 700; }
+
+    .hero-scroll-hint { position: absolute; left: 50%; bottom: .75rem; transform: translateX(-50%);
+      display:flex; flex-direction: column; align-items: center; gap: .4rem; z-index: 5;
+      color: rgba(230,237,243,.8); text-decoration: none; }
+    .hero-scroll-pill { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: .3rem .65rem; border-radius: 9999px; border: 1px solid rgba(49,208,195,.18);
+      background: rgba(8,18,32,.35); }
+    .hero-scroll-dot { width: 6px; height: 18px; border-radius: 9999px; border: 1px solid rgba(49,208,195,.35);
+      position: relative; overflow: hidden; }
+    .hero-scroll-dot::after { content:\"\"; position: absolute; left: 50%; top: 4px; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 9999px; background: rgba(49,208,195,.9);
+      animation: scrollDot 1.35s ease-in-out infinite; }
+    @keyframes scrollDot { 0% { transform: translate(-50%, 0); opacity: .45; } 55% { transform: translate(-50%, 8px); opacity: 1; } 100% { transform: translate(-50%, 12px); opacity: .2; } }
+    @media (prefers-reduced-motion: reduce) { .hero-scroll-dot::after { animation: none; opacity: .6; } }
+    html[data-motion="off"] .hero-scroll-dot::after { animation: none; opacity: .6; }
 
     /* ---------- Sticky navigation: polish layer ---------- */
     /* Offset smooth anchor jumps so targets land below the sticky header. */
@@ -1591,6 +1669,31 @@ function initCtaEmphasis() {
   obs.observe(contact);
 }
 
+function initHeroIntroMotion({ allowMotion }) {
+  if (!allowMotion) return;
+  if (document.documentElement.dataset.motion === "off") return;
+  if (typeof window.gsap === "undefined") return;
+
+  const hero = document.querySelector('section[data-scene="hero"]');
+  if (!hero) return;
+  const items = Array.from(hero.querySelectorAll(".hero-reveal"));
+  if (!items.length) return;
+
+  // Run once on load; the scroll-led narrative handles transitions afterwards.
+  window.gsap.fromTo(
+    items,
+    { autoAlpha: 0, y: 14 },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.65,
+      ease: "power2.out",
+      stagger: 0.07,
+      clearProps: "opacity,transform",
+    },
+  );
+}
+
 injectUtilityClasses();
 flagViewTransitions();
 initYear();
@@ -1601,6 +1704,7 @@ initScrollSpy();
 const allowMotion = setMotionMode();
 initReveal();
 initCursorTrail({ allowMotion });
+initHeroIntroMotion({ allowMotion });
 initThree(allowMotion);
 if (typeof window.initStoryScroll === "function") window.initStoryScroll(allowMotion);
 initProjectModal();
