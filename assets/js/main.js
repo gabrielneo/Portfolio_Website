@@ -806,6 +806,94 @@ function injectUtilityClasses() {
       box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
     .hero-metric-k { color: rgba(142,242,232,.92); font-weight: 700; }
 
+    /* ---------- Hero: typewriter headline ---------- */
+    /* Every character is laid out at its final wrapped position on first paint
+       (with visibility:hidden) so the headline never shifts as letters appear.
+       The caret is absolutely positioned over the stage and jumps to the
+       trailing edge of the most recently revealed character. */
+    .hero-type-stage { position: relative; display: block; }
+    .hero-char { visibility: hidden; }
+    /* Revealed characters briefly flash a luminous violet→cyan glow, then
+       settle into a calm resting shimmer that keeps the whole line glowing. */
+    .hero-char.is-shown {
+      visibility: visible;
+      animation: heroCharLight 1.1s ease-out forwards;
+      text-shadow: 0 0 14px rgba(125, 211, 252, 0.22), 0 0 28px rgba(167, 139, 250, 0.12);
+    }
+    @keyframes heroCharLight {
+      0% {
+        color: #f5f7ff;
+        text-shadow:
+          0 0 10px rgba(240, 249, 255, 0.95),
+          0 0 22px rgba(125, 211, 252, 0.85),
+          0 0 38px rgba(167, 139, 250, 0.6);
+      }
+      60% {
+        text-shadow:
+          0 0 16px rgba(125, 211, 252, 0.55),
+          0 0 32px rgba(167, 139, 250, 0.35);
+      }
+      100% {
+        color: inherit;
+        text-shadow:
+          0 0 14px rgba(125, 211, 252, 0.22),
+          0 0 28px rgba(167, 139, 250, 0.12);
+      }
+    }
+    /* Traveling glow sweep: re-triggered on a 3-second cycle so the headline
+       pulses from first character to last like a soft wave of light. */
+    .hero-char.is-pulsing {
+      animation: heroCharPulse 0.65s ease-out;
+    }
+    @keyframes heroCharPulse {
+      0% {
+        color: inherit;
+        text-shadow:
+          0 0 14px rgba(125, 211, 252, 0.22),
+          0 0 28px rgba(167, 139, 250, 0.12);
+      }
+      45% {
+        color: #f5f7ff;
+        text-shadow:
+          0 0 12px rgba(240, 249, 255, 0.95),
+          0 0 28px rgba(125, 211, 252, 0.8),
+          0 0 48px rgba(167, 139, 250, 0.55);
+      }
+      100% {
+        color: inherit;
+        text-shadow:
+          0 0 14px rgba(125, 211, 252, 0.22),
+          0 0 28px rgba(167, 139, 250, 0.12);
+      }
+    }
+    .hero-type-caret {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2.5px;
+      height: 0.9em;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #e0f2fe 0%, #7dd3fc 45%, #a78bfa 100%);
+      box-shadow:
+        0 0 8px rgba(224, 242, 254, 0.95),
+        0 0 18px rgba(125, 211, 252, 0.8),
+        0 0 36px rgba(167, 139, 250, 0.55);
+      animation: heroCaretBlink 1s steps(2, jump-none) infinite;
+      transition: opacity .6s ease;
+      pointer-events: none;
+      will-change: transform;
+    }
+    @keyframes heroCaretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+    .hero-type-caret.is-stopped { animation: none; opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-type-caret { animation: none; opacity: 0; }
+      .hero-char.is-shown,
+      .hero-char.is-pulsing { animation: none; text-shadow: none; }
+    }
+    html[data-motion="off"] .hero-type-caret { display: none; }
+    html[data-motion="off"] .hero-char.is-shown,
+    html[data-motion="off"] .hero-char.is-pulsing { animation: none; text-shadow: none; }
+
     .hero-scroll-hint { position: absolute; left: 50%; bottom: .75rem; transform: translateX(-50%);
       display:flex; flex-direction: column; align-items: center; gap: .4rem; z-index: 5;
       color: rgba(230,237,243,.8); text-decoration: none; }
@@ -1670,28 +1758,141 @@ function initCtaEmphasis() {
 }
 
 function initHeroIntroMotion({ allowMotion }) {
-  if (!allowMotion) return;
-  if (document.documentElement.dataset.motion === "off") return;
-  if (typeof window.gsap === "undefined") return;
-
   const hero = document.querySelector('section[data-scene="hero"]');
   if (!hero) return;
-  const items = Array.from(hero.querySelectorAll(".hero-reveal"));
-  if (!items.length) return;
 
-  // Run once on load; the scroll-led narrative handles transitions afterwards.
-  window.gsap.fromTo(
-    items,
-    { autoAlpha: 0, y: 14 },
-    {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.65,
-      ease: "power2.out",
-      stagger: 0.07,
-      clearProps: "opacity,transform",
-    },
-  );
+  const h1 = hero.querySelector("[data-typewriter]");
+  const fullText = h1 ? (h1.textContent || "").replace(/\s+/g, " ").trim() : "";
+  if (!h1 || !fullText) return;
+
+  // Full sentence for screen readers regardless of animation state.
+  h1.setAttribute("aria-label", fullText);
+
+  const motionOff =
+    !allowMotion ||
+    document.documentElement.dataset.motion === "off" ||
+    typeof window.gsap === "undefined";
+
+  if (motionOff) {
+    // Show the full headline immediately, no typewriter.
+    h1.textContent = fullText;
+    return;
+  }
+
+  const gsap = window.gsap;
+
+  // Build every character up front in its final wrapped position. Each span
+  // is visibility:hidden so it reserves its exact layout slot; typing then
+  // flips them visible in order. This keeps letters from sliding rightward.
+  h1.textContent = "";
+  const stage = document.createElement("span");
+  stage.className = "hero-type-stage";
+  stage.setAttribute("aria-hidden", "true");
+
+  const chars = [];
+  for (const ch of fullText) {
+    const sp = document.createElement("span");
+    sp.className = "hero-char";
+    // Non-breaking invisibility for spaces while retaining break opportunity.
+    sp.textContent = ch;
+    stage.appendChild(sp);
+    chars.push(sp);
+  }
+
+  const caret = document.createElement("span");
+  caret.className = "hero-type-caret";
+  stage.appendChild(caret);
+  h1.appendChild(stage);
+
+  // Position the caret at the trailing edge of the n-th character.
+  // Uses rect measurement so the caret lands correctly on every line even
+  // when the headline wraps across multiple lines.
+  const placeCaretAt = (idx) => {
+    if (!chars.length) return;
+    const clamped = Math.max(0, Math.min(chars.length - 1, idx));
+    const target = chars[clamped];
+    if (!target) return;
+    const stageRect = stage.getBoundingClientRect();
+    const r = target.getBoundingClientRect();
+    // Before the first char has been "typed", anchor to its leading edge.
+    const atLeading = idx < 0;
+    const x = (atLeading ? r.left : r.right) - stageRect.left;
+    const y = r.top - stageRect.top + r.height * 0.08;
+    caret.style.transform = `translate(${x}px, ${y}px)`;
+    caret.style.height = `${r.height * 0.82}px`;
+  };
+
+  // Initial caret placement once the browser has laid out the headline.
+  requestAnimationFrame(() => placeCaretAt(-1));
+
+  // Split after commas to insert natural pauses between clauses.
+  const segments = fullText.split(/(?<=,)/);
+  const charDuration = 0.044; // ~44ms per character — 2× slower, calmer cadence
+  const commaPause = 0.22;
+  let typedCount = 0;
+
+  const tl = gsap.timeline();
+
+  segments.forEach((seg, idx) => {
+    const startLen = typedCount;
+    const endLen = startLen + seg.length;
+    const counter = { n: startLen };
+    tl.to(counter, {
+      n: endLen,
+      duration: Math.max(0.08, seg.length * charDuration),
+      ease: "none",
+      onUpdate: () => {
+        const cur = Math.floor(counter.n);
+        for (let i = 0; i < cur; i++) {
+          const c = chars[i];
+          if (c && !c.classList.contains("is-shown")) {
+            c.classList.add("is-shown");
+          }
+        }
+        placeCaretAt(cur - 1);
+      },
+    });
+    typedCount = endLen;
+    if (idx < segments.length - 1) {
+      tl.to({}, { duration: commaPause });
+    }
+  });
+
+  tl.call(() => {
+    chars.forEach((c) => c.classList.add("is-shown"));
+    placeCaretAt(chars.length - 1);
+    // Caret stays parked at the end and keeps blinking (CSS animation).
+    // Start a 3-second glow wave that travels first → last character.
+    startHeadlineGlowWave(chars);
+  });
+}
+
+function startHeadlineGlowWave(chars) {
+  if (!chars || !chars.length) return;
+  const gsap = window.gsap;
+  if (!gsap) return;
+  if (document.documentElement.dataset.motion === "off") return;
+
+  // Sweep duration + repeat delay = 3 seconds per full cycle.
+  const sweepDuration = 1.4;
+  const cycleDelay = 1.6;
+  const perChar = sweepDuration / Math.max(1, chars.length - 1);
+
+  const waveTl = gsap.timeline({ repeat: -1, repeatDelay: cycleDelay });
+
+  chars.forEach((c, i) => {
+    waveTl.call(
+      () => {
+        // Restart the CSS pulse animation on each pass.
+        c.classList.remove("is-pulsing");
+        // Force reflow so the animation actually replays.
+        void c.offsetWidth;
+        c.classList.add("is-pulsing");
+      },
+      null,
+      i * perChar,
+    );
+  });
 }
 
 injectUtilityClasses();
