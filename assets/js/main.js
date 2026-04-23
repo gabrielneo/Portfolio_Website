@@ -538,6 +538,7 @@ function injectUtilityClasses() {
         0 0 0 1px rgba(49, 208, 195, 0.08),
         var(--elev-2);
     }
+    .strengths-carousel--js .strengths-carousel__card.is-strength-side { cursor: pointer; }
     .strengths-carousel__card.is-strength-peek {
       opacity: 0.32;
       transform: scale(0.82) translateY(18px);
@@ -2437,6 +2438,8 @@ function initStrengthsCarousel({ allowMotion }) {
   let io = null;
   let inView = false;
   let paused = false;
+  // 1 = normal (advance), -1 = reverse.
+  let rotationDir = 1;
   /** Which card index is in the left column (center = +1, right = +2, peek = +3 mod 4). */
   let focusIndex = 0;
 
@@ -2542,7 +2545,7 @@ function initStrengthsCarousel({ allowMotion }) {
     stopTimer();
     if (root.classList.contains("strengths-carousel--stack")) return;
     intervalId = window.setInterval(() => {
-      if (!paused && inView) goNext();
+      if (!paused && inView) (rotationDir === 1 ? goNext() : goPrev());
     }, 3000);
   };
 
@@ -2634,15 +2637,43 @@ function initStrengthsCarousel({ allowMotion }) {
     if (root.classList.contains("strengths-carousel--stack")) return;
     if (e.key === "ArrowRight") {
       e.preventDefault();
+      rotationDir = 1;
       goNext();
       stopTimer();
       startTimer();
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
+      rotationDir = -1;
       goPrev();
       stopTimer();
       startTimer();
     }
+  });
+
+  // Click-to-rotate: click left card -> becomes center (normal direction).
+  // Click right card -> becomes center (then rotate in reverse).
+  root.addEventListener("click", (e) => {
+    if (root.classList.contains("strengths-carousel--stack")) return;
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    const card = t.closest(".strengths-carousel__card");
+    if (!card) return;
+    if (card.classList.contains("is-strength-center")) return;
+    if (card.classList.contains("is-strength-peek")) return;
+
+    const inLeft = !!card.closest(".strengths-carousel__slot--left");
+    const inRight = !!card.closest(".strengths-carousel__slot--right");
+    if (!inLeft && !inRight) return;
+
+    if (inLeft) {
+      rotationDir = 1;
+      goPrev(); // left -> center
+    } else if (inRight) {
+      rotationDir = -1;
+      goNext(); // right -> center
+    }
+    stopTimer();
+    startTimer();
   });
 
   refreshMode();
