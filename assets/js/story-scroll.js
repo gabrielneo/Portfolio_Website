@@ -99,9 +99,11 @@ window.initStoryScroll = function initStoryScroll(allowMotion) {
 
     ScrollTrigger.create({
       trigger: s.el,
-      // Wide overlap so the handoff reads as cinematic, not abrupt.
-      start: "top 85%",
-      end: "bottom 15%",
+      // Start the fade as soon as the section enters the viewport to avoid
+      // "blank gaps" between scenes. Using full-pass bounds creates natural
+      // overlap: previous fades out as it exits, next fades in as it enters.
+      start: "top bottom",
+      end: "bottom top",
       scrub: true,
       fastScrollEnd: true,
       onUpdate: (self) => {

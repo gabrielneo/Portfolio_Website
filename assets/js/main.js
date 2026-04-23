@@ -344,6 +344,65 @@ function injectUtilityClasses() {
       box-shadow: inset 0 1px 0 0 rgba(42, 157, 143, .10);
     }
 
+    /* ---------- Recruiter scan rhythm: takeaway + next-section preview ---------- */
+    .takeaway-line { max-width: 42rem; }
+    .section-tease {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.2rem 0.45rem;
+      margin-top: 1.25rem;
+      padding: 0.45rem 0.7rem;
+      border-radius: var(--r-md);
+      border: 1px solid rgba(49, 208, 195, 0.14);
+      background: rgba(8, 18, 32, 0.32);
+      font-size: 0.76rem;
+      line-height: 1.25;
+      color: rgba(215, 222, 230, 0.88);
+      text-decoration: none;
+      width: fit-content;
+      max-width: fit-content;
+      justify-self: start;
+      align-self: flex-start;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+    .section-tease:hover {
+      border-color: rgba(49, 208, 195, 0.36);
+      background: rgba(8, 18, 32, 0.48);
+      transform: translateY(-1px);
+    }
+    .section-tease:focus-visible {
+      outline: 2px solid rgba(42, 157, 143, 0.55);
+      outline-offset: 3px;
+    }
+    .section-tease-k {
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      color: rgba(142, 242, 232, 0.95);
+    }
+    .section-tease-sep { opacity: 0.45; }
+    .section-tease-mid { font-weight: 700; color: rgba(230, 237, 243, 0.96); }
+    .section-tease-payoff { color: rgba(215, 222, 230, 0.72); }
+    .section-tease-arrow { color: rgba(142, 242, 232, 0.85); margin-left: 0.05rem; }
+    html[data-motion="off"] .section-tease:hover { transform: none; }
+
+    /* Keep the preview compact on small screens. */
+    @media (max-width: 639px) {
+      .section-tease { margin-top: 1rem; }
+      .section-tease-payoff { display: none; }
+    }
+
+    .card-proof {
+      margin-top: 0.55rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: rgba(127, 205, 191, 0.88);
+    }
+
     /* Mobile: slightly tighter accent spread so it never dominates. */
     @media (max-width: 639px) {
       .section {
@@ -524,6 +583,46 @@ function injectUtilityClasses() {
     .contact-link:hover { color: var(--accent-200); text-decoration-color: #2A9D8F; }
     .contact-link:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 3px; }
 
+    /* Contact details: recruiter-friendly alignment (label column is fixed). */
+    .contact-dl {
+      display: grid;
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: .6rem 1rem;
+      align-items: baseline;
+      padding: 1rem 1.05rem;
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      color: var(--text-lo);
+    }
+    .contact-dl dt {
+      font-size: .68rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: rgba(174,185,198,.92);
+    }
+    .contact-dl dd { min-width: 0; color: rgba(230,234,240,.92); }
+    .contact-value { color: rgba(230,234,240,.92); font-weight: 600; }
+    .contact-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: .2rem .5rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(49,208,195,.22);
+      background: rgba(42,157,143,.12);
+      color: rgba(223,243,239,.92);
+      font-weight: 700;
+      font-size: .72rem;
+      letter-spacing: .01em;
+      vertical-align: baseline;
+    }
+    .contact-sep { margin-inline: .4rem; opacity: .55; }
+    @media (max-width: 639px) {
+      .contact-dl { grid-template-columns: 6rem minmax(0, 1fr); }
+    }
+
     .aside-link { display: inline-flex; align-items: center; min-height: 2rem;
       padding: .15rem .2rem; font-weight: 500; font-size: .85rem;
       color: var(--text-md); text-decoration: underline; text-underline-offset: 4px;
@@ -568,10 +667,27 @@ function injectUtilityClasses() {
     html[data-motion="off"] .pill:hover { transform: none; }
 
     /* Sits one layer higher than .panel (surface-2) so it reads as nested. */
-    .mini-card { border-radius: var(--r-lg); border: 1px solid var(--border-soft); background: var(--surface-2); padding: 1rem 1.1rem;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+    .mini-card {
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border-soft);
+      background: var(--surface-2);
+      padding: 1rem 1.1rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 7.1rem; /* aligns People/Process/Product tiles visually */
+    }
     .mini-kicker { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
-    .mini-text { margin-top: .4rem; font-weight: 600; color: var(--text-hi); letter-spacing: -0.005em; }
+    .mini-text {
+      margin-top: .4rem;
+      font-weight: 600;
+      color: var(--text-hi);
+      letter-spacing: -0.005em;
+      line-height: 1.25;
+      hyphens: none;
+      word-break: normal;
+    }
 
     /* Tags: compact, brand-tinted, for tech/method callouts inside cards. */
     .tag { font-size: .72rem; border-radius: 9999px; padding: .28rem .6rem; font-weight: 500;
@@ -1827,7 +1943,7 @@ function initHeroIntroMotion({ allowMotion }) {
 
   // Split after commas to insert natural pauses between clauses.
   const segments = fullText.split(/(?<=,)/);
-  const charDuration = 0.044; // ~44ms per character — 2× slower, calmer cadence
+  const charDuration = 0.044; // ~44ms per character (2× slower, calmer cadence)
   const commaPause = 0.22;
   let typedCount = 0;
 
