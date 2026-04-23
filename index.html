@@ -455,12 +455,6 @@
                 </div>
               </dl>
 
-              <!--
-                Keep this panel light: the main pitch above owns the primary
-                CTAs (View projects / Resume / Contact). Only surface the two
-                channels the main pitch does NOT cover, so the aside stays
-                informational rather than a second CTA row.
-              -->
               <p class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-300 sm:mt-6">
                 <span class="font-semibold text-ink-50">Connect:</span>
                 <a
@@ -558,34 +552,48 @@
             <a href="#projects" class="reveal shrink-0 text-sm font-semibold text-calm-200 underline-offset-4 hover:underline">Proof: projects <span aria-hidden="true">→</span></a>
           </div>
 
-          <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="card reveal">
-              <h3 class="card-title">Stakeholder alignment</h3>
-              <p class="card-body">
-                Discovery that lands a <strong class="font-semibold text-ink-900 dark:text-ink-50">shared definition of success</strong>, not a slide deck nobody uses.
-              </p>
-              <p class="card-proof">Proof: facilitation · exec-ready summaries</p>
+          <div
+            class="reveal strengths-carousel-wrap mt-8"
+            data-strengths-carousel
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Strengths on delivery teams. Three cards in view with the next card peeking behind the center. Auto-rotates every five seconds."
+            tabindex="0"
+          >
+            <div class="strengths-carousel__viewport">
+              <div class="strengths-carousel__track" id="strengthsCarouselTrack">
+                <div class="card strengths-carousel__card">
+                  <h3 class="card-title">Stakeholder alignment</h3>
+                  <p class="card-body">
+                    Discovery that lands a <strong class="font-semibold text-ink-900 dark:text-ink-50">shared definition of success</strong>, not a slide deck nobody uses.
+                  </p>
+                  <p class="card-proof">Proof: facilitation · exec-ready summaries</p>
+                </div>
+                <div class="card strengths-carousel__card">
+                  <h3 class="card-title">Requirements &amp; scope</h3>
+                  <p class="card-body">
+                    Stories + acceptance criteria + <strong class="font-semibold text-ink-900 dark:text-ink-50">MoSCoW</strong> so sprint planning debates shrink.
+                  </p>
+                  <p class="card-proof">Proof: JIRA hygiene · traceable scope</p>
+                </div>
+                <div class="card strengths-carousel__card">
+                  <h3 class="card-title">Workflow improvement</h3>
+                  <p class="card-body">
+                    As-is / to-be flows that cut <strong class="font-semibold text-ink-900 dark:text-ink-50">rework &amp; duplicate capture</strong> at handoffs.
+                  </p>
+                  <p class="card-proof">Proof: service mapping · quick wins</p>
+                </div>
+                <div class="card strengths-carousel__card">
+                  <h3 class="card-title">Delivery coordination</h3>
+                  <p class="card-body">
+                    Cadence + <strong class="font-semibold text-ink-900 dark:text-ink-50">visible risks</strong> + light docs so teams align without meeting sprawl.
+                  </p>
+                  <p class="card-proof">Proof: governance · reporting rhythm</p>
+                </div>
+              </div>
             </div>
-            <div class="card reveal">
-              <h3 class="card-title">Requirements &amp; scope</h3>
-              <p class="card-body">
-                Stories + acceptance criteria + <strong class="font-semibold text-ink-900 dark:text-ink-50">MoSCoW</strong> so sprint planning debates shrink.
-              </p>
-              <p class="card-proof">Proof: JIRA hygiene · traceable scope</p>
-            </div>
-            <div class="card reveal">
-              <h3 class="card-title">Workflow improvement</h3>
-              <p class="card-body">
-                As-is / to-be flows that cut <strong class="font-semibold text-ink-900 dark:text-ink-50">rework &amp; duplicate capture</strong> at handoffs.
-              </p>
-              <p class="card-proof">Proof: service mapping · quick wins</p>
-            </div>
-            <div class="card reveal">
-              <h3 class="card-title">Delivery coordination</h3>
-              <p class="card-body">
-                Cadence + <strong class="font-semibold text-ink-900 dark:text-ink-50">visible risks</strong> + light docs so teams align without meeting sprawl.
-              </p>
-              <p class="card-proof">Proof: governance · reporting rhythm</p>
+            <div class="strengths-carousel__footer">
+              <div class="strengths-carousel__dots" role="tablist" aria-label="Strengths slides"></div>
             </div>
           </div>
           <a href="#projects" class="reveal section-tease" aria-label="Continue to Featured projects">
@@ -613,7 +621,7 @@
                 </p>
                 <h2 class="reveal h2 mt-2 text-ink-50">Results at a glance</h2>
               </div>
-              <a href="#projectsGrid" class="reveal shrink-0 text-sm font-semibold text-calm-200 underline-offset-4 hover:underline">Full cards →</a>
+              <a href="#projectsHeading" class="reveal shrink-0 text-sm font-semibold text-calm-200 underline-offset-4 hover:underline">Full cards →</a>
             </div>
 
             <div class="mt-6 case-carousel flex gap-4 overflow-x-auto pb-2 sm:mt-8 sm:gap-5 md:grid md:overflow-visible md:pb-0 md:grid-cols-2 lg:grid-cols-3"
@@ -623,7 +631,7 @@
               tabindex="0"
               aria-label="Case studies carousel. Scroll horizontally, or drag on touch/trackpad."
             >
-            <a href="#projectsGrid" class="reveal case-card group" aria-label="Case study: Digital transformation governance and KPI reporting">
+            <a href="#projectsHeading" class="reveal case-card group" aria-label="Case study: Digital transformation governance and KPI reporting">
               <div class="case-top">
                 <span class="case-kicker">Program delivery • Digital transformation</span>
                 <span class="case-arrow" aria-hidden="true">→</span>
@@ -648,7 +656,7 @@
               </div>
             </a>
 
-            <a href="#projectsGrid" class="reveal case-card group" aria-label="Case study: ERP onboarding, requirements, and data migration quality">
+            <a href="#projectsHeading" class="reveal case-card group" aria-label="Case study: ERP onboarding, requirements, and data migration quality">
               <div class="case-top">
                 <span class="case-kicker">ERP delivery • Requirements &amp; data migration</span>
                 <span class="case-arrow" aria-hidden="true">→</span>
@@ -673,7 +681,7 @@
               </div>
             </a>
 
-            <a href="#projectsGrid" class="reveal case-card group" aria-label="Case study: QA execution and automation to reduce manual testing effort">
+            <a href="#projectsHeading" class="reveal case-card group" aria-label="Case study: QA execution and automation to reduce manual testing effort">
               <div class="case-top">
                 <span class="case-kicker">Public sector • QA &amp; test automation</span>
                 <span class="case-arrow" aria-hidden="true">→</span>
@@ -698,20 +706,10 @@
               </div>
             </a>
             </div>
-            <a href="#experience" class="reveal section-tease" aria-label="Continue to Experience timeline">
-              <span class="section-tease-k">Next</span>
-              <span class="section-tease-sep" aria-hidden="true">·</span>
-              <span class="section-tease-mid">Experience</span>
-              <span class="section-tease-payoff">Where these habits were built</span>
-              <span class="section-tease-arrow" aria-hidden="true">↓</span>
-            </a>
           </div>
 
           <div class="container border-t border-ink-700/40 py-14 sm:py-16">
-          <h3 id="projectsHeading" class="text-lg font-semibold text-ink-50">Selected projects</h3>
-          <p class="reveal mt-2 max-w-2xl text-sm text-ink-200">
-            <strong class="font-semibold text-ink-50">Click</strong> a card · <strong class="font-semibold text-ink-50">Esc</strong> closes the modal.
-          </p>
+          <h3 id="projectsHeading" class="text-lg font-semibold text-ink-50 scroll-mt-24">Selected projects</h3>
 
           <div class="mt-6 grid gap-4 sm:mt-8 sm:gap-5 md:grid-cols-2 lg:grid-cols-3" id="projectsGrid">
             <!--
@@ -766,6 +764,13 @@
               </div>
             </button>
           </div>
+          <a href="#experience" class="reveal section-tease" aria-label="Continue to Experience timeline">
+            <span class="section-tease-k">Next</span>
+            <span class="section-tease-sep" aria-hidden="true">·</span>
+            <span class="section-tease-mid">Experience</span>
+            <span class="section-tease-payoff">Where these habits were built</span>
+            <span class="section-tease-arrow" aria-hidden="true">↓</span>
+          </a>
           </div>
         </div>
       </section>
@@ -815,9 +820,7 @@
       <section id="experience" data-scene="experience" class="section scene-pin flex min-h-[72svh] flex-col justify-start py-10 sm:py-12">
         <div data-scene-inner class="container">
           <p class="text-xs font-semibold uppercase tracking-wider text-calm-300">Experience</p>
-          <p class="reveal takeaway-line mt-2 text-sm font-semibold leading-snug text-calm-100">
-            Takeaway: <strong class="font-semibold text-ink-50">Three internships</strong>: governance, ERP data quality, QA automation.
-          </p>
+
           <h2 class="reveal h2 mt-3">Experience timeline</h2>
           <p class="reveal mt-2 max-w-2xl text-sm text-ink-700 dark:text-ink-200">
             One line per role · <strong class="font-semibold text-ink-900 dark:text-ink-50">Show details</strong> for bullets.

@@ -403,6 +403,200 @@ function injectUtilityClasses() {
       color: rgba(127, 205, 191, 0.88);
     }
 
+    /* ---------- Strengths: 3-up “cover” carousel (desktop) ---------- */
+    .strengths-carousel-wrap { outline-offset: 4px; }
+    .strengths-carousel-wrap:focus-visible { outline: 2px solid rgba(42, 157, 143, 0.65); }
+    .strengths-carousel__viewport {
+      overflow: hidden;
+      width: 100%;
+      position: relative;
+      --strength-gap: 0.9rem;
+      --strength-overlap: 1.15rem;
+    }
+    .strengths-carousel__track {
+      display: flex;
+      gap: var(--strength-gap);
+    }
+    .strengths-carousel--js .strengths-carousel__track {
+      display: none !important;
+    }
+    .strengths-carousel--stack .strengths-carousel__viewport { overflow: visible; }
+    .strengths-carousel--stack .strengths-carousel__track {
+      flex-wrap: wrap;
+    }
+    .strengths-carousel--stack .strengths-carousel__card {
+      flex: 1 1 calc(50% - 0.5rem);
+      min-width: min(100%, 16rem);
+      max-width: 100%;
+    }
+    @media (max-width: 639px) {
+      .strengths-carousel--stack .strengths-carousel__card { flex: 1 1 100%; }
+    }
+    .strengths-carousel__stage {
+      position: relative;
+      min-height: 14.25rem;
+    }
+    .strengths-carousel__row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: var(--strength-gap);
+      align-items: stretch;
+      justify-content: center;
+    }
+    .strengths-carousel__slot {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      min-width: 0;
+      max-width: 22.5rem;
+    }
+    .strengths-carousel__slot--left { transform: translateX(var(--strength-overlap)); }
+    .strengths-carousel__slot--right { transform: translateX(calc(var(--strength-overlap) * -1)); }
+    .strengths-carousel__center-col {
+      position: relative;
+      flex: 1.22;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      min-width: 0;
+      max-width: 25rem;
+    }
+    .strengths-carousel__peek-slot {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+    }
+    .strengths-carousel__center-slot {
+      position: relative;
+      z-index: 1;
+      width: 86%;
+      max-width: 100%;
+      display: flex;
+      align-items: stretch;
+      align-self: center;
+    }
+    .strengths-carousel__slot .strengths-carousel__card,
+    .strengths-carousel__peek-slot .strengths-carousel__card,
+    .strengths-carousel__center-slot .strengths-carousel__card {
+      width: 100%;
+      transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease, box-shadow 0.45s ease;
+    }
+    /* Scoped surface polish: make carousel cards feel like “slides” without
+       changing cards elsewhere on the site. */
+    .strengths-carousel__card {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(120% 80% at 20% 0%, rgba(49, 208, 195, 0.10), rgba(49, 208, 195, 0) 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+      border-color: rgba(255, 255, 255, 0.10);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--elev-1);
+    }
+    /* Slide number (01–04) — subtle but readable. */
+    .strengths-carousel__card::before {
+      content: attr(data-strength-label);
+      position: absolute;
+      top: 0.85rem;
+      right: 0.95rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: rgba(142, 242, 232, 0.9);
+      opacity: 0.78;
+      text-shadow: 0 10px 30px rgba(0,0,0,.35);
+      pointer-events: none;
+    }
+    .strengths-carousel__card .card-body { color: rgba(230, 234, 240, 0.86); }
+    .strengths-carousel__card .card-proof { color: rgba(127, 205, 191, 0.95); }
+
+    .strengths-carousel__card.is-strength-side {
+      opacity: 0.68;
+      transform: scale(0.955) translateY(4px);
+      filter: saturate(0.9) brightness(0.94);
+      background:
+        radial-gradient(120% 80% at 10% 0%, rgba(38, 70, 83, 0.22), rgba(38, 70, 83, 0) 62%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .strengths-carousel__card.is-strength-center {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      filter: none;
+      background:
+        radial-gradient(120% 85% at 18% 0%, rgba(49, 208, 195, 0.16), rgba(49, 208, 195, 0) 62%),
+        radial-gradient(110% 90% at 100% 100%, rgba(42, 157, 143, 0.10), rgba(42, 157, 143, 0) 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+      border-color: rgba(49, 208, 195, 0.22);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        0 0 0 1px rgba(49, 208, 195, 0.08),
+        var(--elev-2);
+    }
+    .strengths-carousel__card.is-strength-peek {
+      opacity: 0.32;
+      transform: scale(0.82) translateY(18px);
+      filter: saturate(0.86) brightness(0.9);
+      max-width: 90%;
+      background:
+        radial-gradient(120% 85% at 15% 0%, rgba(49, 208, 195, 0.10), rgba(49, 208, 195, 0) 64%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    /* Peek should hint “another card exists” without letting text show through. */
+    .strengths-carousel__card.is-strength-peek .card-title,
+    .strengths-carousel__card.is-strength-peek .card-body,
+    .strengths-carousel__card.is-strength-peek .card-proof {
+      opacity: 0 !important;
+    }
+    .strengths-carousel__card.is-strength-peek::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(120% 80% at 30% 0%, rgba(49, 208, 195, 0.12), rgba(49, 208, 195, 0) 60%),
+        linear-gradient(120deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 42%);
+      opacity: 0.55;
+      pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .strengths-carousel__slot .strengths-carousel__card,
+      .strengths-carousel__peek-slot .strengths-carousel__card,
+      .strengths-carousel__center-slot .strengths-carousel__card {
+        transition: none;
+      }
+    }
+    .strengths-carousel__footer {
+      margin-top: 0.85rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .strengths-carousel--stack .strengths-carousel__footer { display: none; }
+    .strengths-carousel__dots { display: flex; gap: 0.45rem; align-items: center; }
+    .strengths-carousel__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(49, 208, 195, 0.35);
+      background: rgba(8, 18, 32, 0.4);
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+    .strengths-carousel__dot:hover { transform: scale(1.08); border-color: rgba(49, 208, 195, 0.55); }
+    .strengths-carousel__dot[aria-selected="true"] {
+      background: rgba(49, 208, 195, 0.55);
+      border-color: rgba(49, 208, 195, 0.55);
+    }
+    .strengths-carousel__dot:focus-visible { outline: 2px solid rgba(42, 157, 143, 0.65); outline-offset: 2px; }
+
     /* Mobile: slightly tighter accent spread so it never dominates. */
     @media (max-width: 639px) {
       .section {
@@ -771,6 +965,91 @@ function injectUtilityClasses() {
     .pmodal-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
     html[data-motion="off"] .pmodal-backdrop,
     html[data-motion="off"] .pmodal-panel { transition: none; }
+
+    /* ---------- Project quick-view (hover/focus preview) ---------- */
+    .ptease {
+      position: fixed;
+      z-index: 74;
+      width: min(22rem, calc(100vw - 1.25rem));
+      border-radius: 1.1rem;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(14, 20, 28, 0.92);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 18px 55px -30px rgba(0,0,0,.75);
+      opacity: 0;
+      transform: translateY(6px) scale(.98);
+      transition: opacity .12s ease, transform .12s ease;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+    .ptease.is-open { opacity: 1; transform: translateY(0) scale(1); }
+    .ptease-inner { padding: .85rem .9rem .9rem; }
+    .ptease-k { font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; color: rgba(174,185,198,.92); }
+    .ptease-t { margin-top: .35rem; font-size: .95rem; line-height: 1.25; font-weight: 700; color: rgba(230,234,240,.96); }
+    .ptease-i { margin-top: .55rem; display:flex; flex-direction: column; gap: .25rem; }
+    .ptease-i span { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; color: rgba(174,185,198,.92); }
+    .ptease-i strong { color: rgba(142,242,232,.92); font-weight: 700; font-size: .84rem; line-height: 1.2rem; }
+    .ptease-hint { margin-top: .65rem; font-size: .78rem; color: rgba(215,222,230,.62); }
+    .ptease-hint strong { color: rgba(230,234,240,.88); font-weight: 750; }
+
+    .pquick-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 74;
+      background: rgba(6, 10, 16, .58);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity .16s ease;
+      pointer-events: none;
+    }
+    .pquick-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+    .pquick {
+      position: fixed;
+      z-index: 75;
+      left: 50%;
+      top: 50%;
+      width: min(52rem, calc(100vw - 1.5rem));
+      max-height: calc(100vh - 1.5rem);
+      overflow: hidden;
+      border-radius: var(--r-xl);
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(22, 30, 40, .96), rgba(14, 20, 28, .96));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--elev-3);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.96);
+      transition: opacity .16s ease, transform .16s ease;
+      pointer-events: none;
+    }
+    .pquick.is-open {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    .pquick-inner {
+      padding: 1.1rem 1.15rem 1.15rem;
+      max-height: calc(100vh - 1.5rem);
+      overflow: auto;
+    }
+    .pquick-top { display:flex; align-items:flex-start; justify-content:space-between; gap: 1rem; }
+    .pquick-kicker { font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+    .pquick-title { margin-top: .35rem; font-size: 1.08rem; line-height: 1.25; font-weight: 650; letter-spacing: -0.02em; color: var(--text-hi); text-wrap: balance; }
+    .pquick-desc { margin-top: .55rem; color: rgba(230,234,240,.88); font-size: .9rem; line-height: 1.45rem; max-width: 62ch; }
+    .pquick-grid { margin-top: .9rem; display:grid; grid-template-columns: 1fr 1fr; gap: .7rem .8rem; }
+    .pquick-block { border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02);
+      border-radius: var(--r-md); padding: .75rem .85rem; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+    .pquick-h { font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: .45rem; }
+    .pquick-p { color: rgba(230,234,240,.86); font-size: .88rem; line-height: 1.4rem; }
+    .pquick-ul { display:grid; gap: .35rem; color: rgba(230,234,240,.86); font-size: .86rem; line-height: 1.35rem; }
+    .pquick-ul li { position: relative; padding-left: .85rem; }
+    .pquick-ul li::before { content: ""; position:absolute; left: 0; top: .5rem; width: .34rem; height: .34rem; border-radius: 999px; background: rgba(49,208,195,.9); }
+    .pquick-wide { grid-column: 1 / -1; }
+    .pquick-tags { display:flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
+    .pquick-hint { margin-top: .7rem; font-size: .78rem; color: rgba(215,222,230,.72); }
+    .pquick-hint strong { color: rgba(230,234,240,.92); font-weight: 700; }
+    @media (max-width: 740px) {
+      .pquick-grid { grid-template-columns: 1fr; }
+      .pquick { width: calc(100vw - 1rem); max-height: calc(100vh - 1rem); }
+    }
 
     /* Featured case study cards (clickable). Same surface family as .pcard. */
     .case-card { position: relative; display: flex; flex-direction: column; gap: .85rem;
@@ -1422,58 +1701,51 @@ const PROJECT_DATA = {
   "hmgics-governance": {
     kicker: "Program delivery • Digital transformation",
     title: "Governance + KPI reporting for a digital transformation program",
-    desc: "Tracking milestones, delivery health, and risks across workstreams, and packaging updates into decision-ready dashboards for leadership.",
+    desc: "JIRA delivery health + KPI dashboards to keep exec decisions fast and teams aligned.",
     problem:
-      "With multiple parallel workstreams, leaders needed consistent visibility into milestones, risks, and KPIs. Without a clear governance view, decision-making slows and delivery drift increases.",
-    role: "Project Management Intern - supported program governance, cross-functional coordination, and executive reporting using JIRA and structured status updates.",
+      "Parallel workstreams needed one clear view of milestones, risks, and KPIs for leadership decisions.",
+    role: "PM intern: governance cadence, cross-team coordination, exec-ready reporting (JIRA).",
     improved: [
-      "Maintained milestone, health, and risk tracking across workstreams in JIRA.",
-      "Built concise KPI dashboards and executive-ready presentations for regular leadership reviews.",
-      "Improved reporting cadence and documentation quality to keep updates consistent and actionable.",
+      "Maintained milestones, risks, and delivery health in JIRA.",
+      "Built KPI dashboards and decision-ready updates.",
     ],
     outcomes: [
-      "Faster leadership decisions through clearer, more digestible KPI and progress updates.",
-      "Better delivery cadence and shared situational awareness across teams.",
-      "Reduced ambiguity in status reporting through more rigorous documentation.",
+      "Faster leadership decisions with clearer progress signals.",
+      "Stronger cadence and shared situational awareness.",
     ],
     tools: ["JIRA", "Program governance", "KPI dashboards", "Stakeholder coordination", "SDLC awareness"],
   },
   "d365-migration": {
     kicker: "ERP delivery • Requirements & data migration",
     title: "Requirements + data migration for Dynamics 365 Business Central onboarding",
-    desc: "Supporting requirements gathering and migration validation so client onboarding is accurate, traceable, and low-risk at go-live.",
+    desc: "Requirements + migration validation to keep ERP onboarding accurate and low-risk.",
     problem:
-      "ERP onboarding can fail quietly: small data issues or unclear requirements surface after go-live as operational disruption, rework, and support burden.",
-    role: "Associate Consultant Intern - supported requirements gathering, validated migration datasets, and produced functional/technical documentation with internal and external stakeholders.",
+      "Small data issues or unclear requirements often surface after go-live as rework and support burden.",
+    role: "Associate consultant intern: requirements, migration checks, and clear documentation.",
     improved: [
-      "Validated and reconciled migration datasets using Excel to ensure accuracy during onboarding.",
-      "Supported requirements gathering and clarified operational needs with internal/external teams.",
-      "Produced functional and technical documentation to track decisions, risks, and fixes.",
-      "Proactively raised and resolved risks, bugs, and errors before deployment.",
+      "Validated migration datasets (Excel) for accuracy.",
+      "Documented decisions, risks, and fixes for traceability.",
     ],
     outcomes: [
-      "Achieved 100% data accuracy during client onboarding.",
-      "Reduced post-deployment issues by 30% through proactive risk/bug resolution.",
-      "Consistently met project milestones ahead of schedule through coordination and documentation discipline.",
+      "100% onboarding data accuracy; -30% post-deployment issues.",
+      "Milestones met through coordination and documentation discipline.",
     ],
     tools: ["Dynamics 365 Business Central", "Excel", "Requirements gathering", "Data migration", "Functional documentation", "Risk management"],
   },
   "outsystems-qa": {
     kicker: "Public sector • QA & test automation",
     title: "Performance testing + Selenium automation for corporate websites",
-    desc: "Executing structured test coverage on OutSystems sites and automating repetitive checks to improve QA efficiency and consistency.",
+    desc: "Structured QA + Selenium automation to reduce regression effort and improve signal quality.",
     problem:
-      "Manual testing is slow and inconsistent, especially when regression checks repeat across releases. Teams need repeatable coverage without ballooning effort.",
-    role: "Business Analyst Intern (QA) - executed test cases, documented issues with recommendations, and engineered test automation scripts to reduce manual workload.",
+      "Manual regression repeats every release; teams need repeatable coverage without ballooning effort.",
+    role: "BA intern (QA): test execution, clear defect notes, Selenium automation.",
     improved: [
-      "Executed 50+ detailed performance and functional test cases for OutSystems corporate websites.",
-      "Logged issues clearly and proposed actionable improvements to strengthen user experience and reliability.",
-      "Built Selenium automation scripts to streamline repetitive testing workflows.",
+      "Executed 50+ test cases on OutSystems sites.",
+      "Built Selenium scripts to automate repeat checks.",
     ],
     outcomes: [
-      "Reduced manual testing time by 40% via automation.",
-      "Improved speed and consistency of issue discovery across test cycles.",
-      "Strengthened delivery confidence through clearer, repeatable test evidence.",
+      "-40% manual testing time; faster, more consistent defect signal.",
+      "Clearer, repeatable evidence for release confidence.",
     ],
     tools: ["OutSystems", "Selenium", "Test cases", "QA documentation", "Defect triage", "UX feedback"],
   },
@@ -1597,7 +1869,11 @@ function initProjectModal() {
 
   // Open handlers
   document.querySelectorAll(".pcard[data-project-id]").forEach((card) => {
-    card.addEventListener("click", () => open(card.dataset.projectId, card));
+    card.addEventListener("click", () => {
+      // Desktop hover quick-view can take over click to open its own overlay.
+      if (card.getAttribute("data-quick-enabled") === "1") return;
+      open(card.dataset.projectId, card);
+    });
   });
 
   // Close handlers (backdrop + close button)
@@ -1629,6 +1905,278 @@ function initProjectModal() {
       }
     }
   });
+}
+
+function initProjectQuickView() {
+  // Desktop hover only: hover shows a small teaser. Click opens the full overlay.
+  const mq = window.matchMedia?.("(pointer: fine) and (hover: hover)");
+  if (!mq?.matches) return;
+  if (typeof window.gsap === "undefined") return;
+  if (document.documentElement.dataset.motion === "off") return;
+
+  const cards = Array.from(document.querySelectorAll(".pcard[data-project-id]"));
+  if (!cards.length) return;
+
+  // Mark cards so the click modal handler can be bypassed on desktop.
+  cards.forEach((c) => c.setAttribute("data-quick-enabled", "1"));
+
+  const teaser = document.createElement("div");
+  teaser.className = "ptease";
+  teaser.setAttribute("aria-hidden", "true");
+  teaser.innerHTML = `
+    <div class="ptease-inner">
+      <div class="ptease-k" data-t="k"></div>
+      <div class="ptease-t" data-t="t"></div>
+      <div class="ptease-i">
+        <span>What I did</span>
+        <strong data-t="i"></strong>
+      </div>
+      <div class="ptease-hint"><strong>Click</strong> for full details</div>
+    </div>
+  `;
+  document.body.appendChild(teaser);
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "pquick-backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+  document.body.appendChild(backdrop);
+
+  const full = document.createElement("div");
+  full.className = "pquick";
+  full.setAttribute("aria-hidden", "true");
+  full.innerHTML = `
+    <div class="pquick-inner">
+      <div class="pquick-top">
+        <div>
+          <div class="pquick-kicker" data-q="kicker"></div>
+          <div class="pquick-title" data-q="title"></div>
+          <div class="pquick-desc" data-q="desc"></div>
+        </div>
+      </div>
+      <div class="pquick-grid">
+        <div class="pquick-block">
+          <div class="pquick-h">Problem</div>
+          <div class="pquick-p" data-q="problem"></div>
+        </div>
+        <div class="pquick-block">
+          <div class="pquick-h">My role</div>
+          <div class="pquick-p" data-q="role"></div>
+        </div>
+        <div class="pquick-block">
+          <div class="pquick-h">Improved</div>
+          <ul class="pquick-ul" data-q="improved"></ul>
+        </div>
+        <div class="pquick-block">
+          <div class="pquick-h">Impact</div>
+          <ul class="pquick-ul" data-q="outcomes"></ul>
+        </div>
+        <div class="pquick-block pquick-wide">
+          <div class="pquick-h">Tools</div>
+          <div class="pquick-tags" data-q="tools"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(full);
+
+  const t = (k) => teaser.querySelector(`[data-t="${k}"]`);
+  const tm = { k: t("k"), t: t("t"), i: t("i") };
+  const q = (k) => full.querySelector(`[data-q="${k}"]`);
+  const mount = {
+    kicker: q("kicker"),
+    title: q("title"),
+    desc: q("desc"),
+    problem: q("problem"),
+    role: q("role"),
+    improved: q("improved"),
+    outcomes: q("outcomes"),
+    tools: q("tools"),
+  };
+
+  const renderList = (ul, items) => {
+    if (!ul) return;
+    ul.innerHTML = "";
+    for (const item of items) {
+      const li = document.createElement("li");
+      li.textContent = item;
+      ul.appendChild(li);
+    }
+  };
+  const renderTags = (container, items) => {
+    if (!container) return;
+    container.innerHTML = "";
+    for (const item of items) {
+      const span = document.createElement("span");
+      span.className = "tag";
+      span.textContent = item;
+      container.appendChild(span);
+    }
+  };
+
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const positionTeaser = (card) => {
+    const r = card.getBoundingClientRect();
+    const pad = 10;
+    const w = teaser.offsetWidth || 280;
+    const h = teaser.offsetHeight || 140;
+    let left = r.left + r.width / 2 - w / 2;
+    left = clamp(left, pad, window.innerWidth - w - pad);
+    let top = r.top - h - 10;
+    top = clamp(top, pad, window.innerHeight - h - pad);
+    teaser.style.left = `${Math.round(left)}px`;
+    teaser.style.top = `${Math.round(top)}px`;
+  };
+
+  let showT = 0;
+  let activeCard = null;
+  let activeId = "";
+  let fullOpen = false;
+  let posRaf = 0;
+
+  const closeTeaser = () => {
+    if (window.gsap) window.gsap.killTweensOf(teaser);
+    teaser.classList.remove("is-open");
+    teaser.setAttribute("aria-hidden", "true");
+    // Hard reset in case inline styles were applied.
+    teaser.style.opacity = "";
+    teaser.style.transform = "";
+    activeCard = null;
+    activeId = "";
+  };
+
+  const scheduleReposition = () => {
+    if (posRaf) return;
+    posRaf = requestAnimationFrame(() => {
+      posRaf = 0;
+      if (fullOpen) return;
+      if (!activeCard) return;
+      if (!teaser.classList.contains("is-open")) return;
+      positionTeaser(activeCard);
+    });
+  };
+
+  const openTeaser = (card) => {
+    if (fullOpen) return;
+    const id = card?.dataset?.projectId;
+    const data = id ? PROJECT_DATA[id] : null;
+    if (!id || !data) return;
+    activeCard = card;
+    activeId = id;
+    tm.k.textContent = data.kicker || "";
+    tm.t.textContent = data.title || "";
+    // Teaser copy should entice clicks: use the short summary (desc).
+    tm.i.textContent = data.desc || "";
+    positionTeaser(card);
+    teaser.classList.add("is-open");
+    teaser.setAttribute("aria-hidden", "false");
+    scheduleReposition();
+  };
+
+  const openFull = (id) => {
+    const data = PROJECT_DATA[id];
+    if (!data) return;
+    fullOpen = true;
+    closeTeaser();
+
+    mount.kicker.textContent = data.kicker || "";
+    mount.title.textContent = data.title || "";
+    mount.desc.textContent = data.desc || "";
+    mount.problem.textContent = data.problem || "";
+    mount.role.textContent = data.role || "";
+    renderList(mount.improved, data.improved || []);
+    renderList(mount.outcomes, data.outcomes || []);
+    renderTags(mount.tools, data.tools || []);
+
+    backdrop.classList.add("is-open");
+    full.classList.add("is-open");
+    full.setAttribute("aria-hidden", "false");
+
+    window.gsap.killTweensOf(full);
+    window.gsap.fromTo(
+      full,
+      { autoAlpha: 0, scale: 0.96 },
+      { autoAlpha: 1, scale: 1, duration: 0.22, ease: "power2.out", overwrite: true },
+    );
+  };
+
+  const closeFull = () => {
+    fullOpen = false;
+    // Hard-close: GSAP can leave inline opacity/visibility behind.
+    if (window.gsap) {
+      window.gsap.killTweensOf(full);
+      window.gsap.killTweensOf(backdrop);
+      window.gsap.set(full, { clearProps: "opacity,visibility,transform" });
+    }
+    backdrop.classList.remove("is-open");
+    full.classList.remove("is-open");
+    full.setAttribute("aria-hidden", "true");
+    full.style.opacity = "";
+    full.style.visibility = "";
+    full.style.transform = "";
+  };
+
+  cards.forEach((card) => {
+    card.addEventListener("mouseenter", () => {
+      window.clearTimeout(showT);
+      showT = window.setTimeout(() => openTeaser(card), 80);
+    });
+    card.addEventListener("mouseleave", () => {
+      window.clearTimeout(showT);
+      closeTeaser();
+    });
+
+    // Click opens full overlay (desktop). This also closes the teaser.
+    card.addEventListener(
+      "click",
+      (e) => {
+        const id = card.dataset.projectId;
+        if (!id) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (fullOpen && id === activeId) {
+          closeFull();
+          return;
+        }
+        openFull(id);
+      },
+      true,
+    );
+  });
+
+  // Clicking anywhere else closes teaser; clicking backdrop closes full.
+  document.addEventListener(
+    "pointerdown",
+    (e) => {
+      const tEl = e.target;
+      if (fullOpen) {
+        if (tEl === backdrop) closeFull();
+        return;
+      }
+      if (tEl instanceof Node && activeCard && activeCard.contains(tEl)) return;
+      closeTeaser();
+    },
+    { capture: true },
+  );
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      window.clearTimeout(showT);
+      if (fullOpen) closeFull();
+      closeTeaser();
+
+      // Safety net: if the legacy modal is open, close it too.
+      const legacy = document.getElementById("projectModal");
+      if (legacy && legacy.classList.contains("is-open")) {
+        legacy.classList.remove("is-open");
+        legacy.setAttribute("aria-hidden", "true");
+        document.documentElement.classList.remove("modal-open");
+      }
+    }
+  });
+
+  // Keep the teaser anchored to the hovered card during scroll.
+  window.addEventListener("scroll", scheduleReposition, { passive: true });
+  window.addEventListener("resize", scheduleReposition, { passive: true });
 }
 
 function initExpandables() {
@@ -1849,6 +2397,257 @@ function initDragScrollEnhancements({ allowMotion }) {
   els.forEach(enhance);
 }
 
+/**
+ * Strengths section (desktop): three fixed slots (left / center / right) with
+ * the fourth card peeking small behind the center. Left/right are dimmed;
+ * center is full contrast. Auto-rotates every 5s. Below 900px or reduced
+ * motion: static stack, no rotation.
+ */
+function initStrengthsCarousel({ allowMotion }) {
+  const root = document.querySelector("[data-strengths-carousel]");
+  if (!root) return;
+
+  const viewport = root.querySelector(".strengths-carousel__viewport");
+  const track = root.querySelector(".strengths-carousel__track");
+  const dotsHost = root.querySelector(".strengths-carousel__dots");
+  if (!viewport || !track || !dotsHost) return;
+
+  const cardsInOrder = Array.from(track.querySelectorAll(".strengths-carousel__card"));
+  if (cardsInOrder.length !== 4) return;
+  // Numbering is assigned once at start: the initially highlighted (center)
+  // card is 01 and keeps its number as it rotates out.
+  // With focusIndex=0, the initial mapping is:
+  // left = 04, center = 01, right = 02, peek = 03.
+  cardsInOrder[0].setAttribute("data-strength-label", "04");
+  cardsInOrder[1].setAttribute("data-strength-label", "01");
+  cardsInOrder[2].setAttribute("data-strength-label", "02");
+  cardsInOrder[3].setAttribute("data-strength-label", "03");
+
+  const mq = window.matchMedia("(min-width: 900px)");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  let stage = null;
+  let slotL = null;
+  let slotR = null;
+  let peekSlot = null;
+  let slotC = null;
+
+  let dots = [];
+  let intervalId = 0;
+  let io = null;
+  let inView = false;
+  let paused = false;
+  /** Which card index is in the left column (center = +1, right = +2, peek = +3 mod 4). */
+  let focusIndex = 0;
+
+  const stripRoles = () => {
+    cardsInOrder.forEach((c) => {
+      c.classList.remove("is-strength-peek", "is-strength-side", "is-strength-center");
+    });
+  };
+
+  const destroyStage = () => {
+    if (!stage) return;
+    stripRoles();
+    cardsInOrder.forEach((c) => {
+      c.removeAttribute("aria-hidden");
+      c.removeAttribute("tabindex");
+      track.appendChild(c);
+    });
+    stage.remove();
+    stage = null;
+    slotL = slotR = peekSlot = slotC = null;
+  };
+
+  const buildStage = () => {
+    if (stage) return;
+    stage = document.createElement("div");
+    stage.className = "strengths-carousel__stage";
+
+    const row = document.createElement("div");
+    row.className = "strengths-carousel__row";
+
+    slotL = document.createElement("div");
+    slotL.className = "strengths-carousel__slot strengths-carousel__slot--left";
+
+    const centerCol = document.createElement("div");
+    centerCol.className = "strengths-carousel__center-col";
+
+    peekSlot = document.createElement("div");
+    peekSlot.className = "strengths-carousel__peek-slot";
+    peekSlot.setAttribute("aria-hidden", "true");
+
+    slotC = document.createElement("div");
+    slotC.className = "strengths-carousel__center-slot";
+
+    centerCol.append(peekSlot, slotC);
+
+    slotR = document.createElement("div");
+    slotR.className = "strengths-carousel__slot strengths-carousel__slot--right";
+
+    row.append(slotL, centerCol, slotR);
+    stage.append(row);
+    viewport.appendChild(stage);
+  };
+
+  const renderFrame = () => {
+    if (!stage || !slotL || !slotR || !peekSlot || !slotC) return;
+    stripRoles();
+
+    const mount = (slot, cardIndex, role) => {
+      const card = cardsInOrder[cardIndex];
+      slot.appendChild(card);
+      card.classList.add(role);
+      return card;
+    };
+
+    const leftCard = mount(slotL, focusIndex % 4, "is-strength-side");
+    const centerCard = mount(slotC, (focusIndex + 1) % 4, "is-strength-center");
+    const rightCard = mount(slotR, (focusIndex + 2) % 4, "is-strength-side");
+    const peekCard = mount(peekSlot, (focusIndex + 3) % 4, "is-strength-peek");
+
+    cardsInOrder.forEach((c) => {
+      c.removeAttribute("aria-hidden");
+      c.setAttribute("tabindex", "-1");
+    });
+    cardsInOrder[(focusIndex + 3) % 4].setAttribute("aria-hidden", "true");
+
+    syncDots();
+  };
+
+  const syncDots = () => {
+    dots.forEach((d, i) => d.setAttribute("aria-selected", i === focusIndex ? "true" : "false"));
+  };
+
+  const goNext = () => {
+    if (root.classList.contains("strengths-carousel--stack")) return;
+    focusIndex = (focusIndex + 1) % 4;
+    renderFrame();
+  };
+
+  const goPrev = () => {
+    if (root.classList.contains("strengths-carousel--stack")) return;
+    focusIndex = (focusIndex + 3) % 4;
+    renderFrame();
+  };
+
+  const stopTimer = () => {
+    if (intervalId) {
+      window.clearInterval(intervalId);
+      intervalId = 0;
+    }
+  };
+
+  const startTimer = () => {
+    stopTimer();
+    if (root.classList.contains("strengths-carousel--stack")) return;
+    intervalId = window.setInterval(() => {
+      if (!paused && inView) goNext();
+    }, 3000);
+  };
+
+  const buildDots = () => {
+    dotsHost.innerHTML = "";
+    dots = [];
+    for (let i = 0; i < 4; i++) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "strengths-carousel__dot";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-label", `Show strengths slide ${i + 1} of 4`);
+      b.addEventListener("click", () => {
+        focusIndex = i;
+        renderFrame();
+        stopTimer();
+        startTimer();
+      });
+      dotsHost.appendChild(b);
+      dots.push(b);
+    }
+    syncDots();
+  };
+
+  const fullTeardown = () => {
+    stopTimer();
+    destroyStage();
+    dotsHost.innerHTML = "";
+    dots = [];
+    focusIndex = 0;
+    stripRoles();
+  };
+
+  const enableCarousel = () => {
+    fullTeardown();
+    root.classList.remove("strengths-carousel--stack");
+    root.classList.add("strengths-carousel--js");
+    buildStage();
+    buildDots();
+    focusIndex = 0;
+    renderFrame();
+    requestAnimationFrame(() => {
+      const r = root.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) inView = true;
+      startTimer();
+    });
+
+    if (!io) {
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            inView = e.isIntersecting;
+          }
+        },
+        { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
+      );
+    }
+    io.observe(root);
+  };
+
+  const enableStack = () => {
+    fullTeardown();
+    root.classList.add("strengths-carousel--stack");
+    root.classList.remove("strengths-carousel--js");
+    if (io) io.unobserve(root);
+  };
+
+  const refreshMode = () => {
+    const stack =
+      !allowMotion ||
+      document.documentElement.dataset.motion === "off" ||
+      reduced.matches ||
+      !mq.matches;
+    if (stack) enableStack();
+    else enableCarousel();
+  };
+
+  mq.addEventListener("change", refreshMode);
+  reduced.addEventListener("change", refreshMode);
+
+  root.addEventListener("mouseenter", () => {
+    paused = true;
+  });
+  root.addEventListener("mouseleave", () => {
+    paused = false;
+  });
+
+  root.addEventListener("keydown", (e) => {
+    if (root.classList.contains("strengths-carousel--stack")) return;
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      goNext();
+      stopTimer();
+      startTimer();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      goPrev();
+      stopTimer();
+      startTimer();
+    }
+  });
+
+  refreshMode();
+}
+
 // When the Contact section scrolls into view, briefly pulse the primary CTA
 // (Email me) once - a quiet nudge that the page's main action is within
 // reach. One-shot animation, not infinite; skipped for reduced-motion users.
@@ -2029,4 +2828,6 @@ initExpandables();
 initBackToTop();
 initCtaEmphasis();
 initDragScrollEnhancements({ allowMotion });
+initStrengthsCarousel({ allowMotion });
+initProjectQuickView();
 
