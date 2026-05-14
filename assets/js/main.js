@@ -287,16 +287,19 @@ function initReveal() {
 function injectUtilityClasses() {
   const style = document.createElement("style");
   style.textContent = `
-    /* Mobile-first base. Spacing and type scale up at sm/md/lg. */
+    /* Mobile-first base. Gutter ramps via discrete steps; vertical rhythm via clamp(). */
     .container { max-width: 72rem; margin-inline: auto; padding-inline: 1rem; }
     @media (min-width: 640px) { .container { padding-inline: 1.5rem; } }
     @media (min-width: 1024px) { .container { padding-inline: 2rem; } }
+    @media (min-width: 1280px) { .container { padding-inline: 2.25rem; } }
+    @media (min-width: 1536px) { .container { padding-inline: 2.75rem; } }
 
-    .section { padding-block: 3rem; position: relative; isolation: isolate; overflow: hidden; }
+    /* Section vertical rhythm: clamp() so spacing grows smoothly from
+       iPhone SE -> ultrawide, instead of plateauing at 5.5rem above 1024px.
+       Anchors: ~2.75rem on small phones, ~5.5rem at 1024, ~7.25rem at 1920+. */
+    .section { padding-block: clamp(2.75rem, 1.4rem + 5.5vw, 7.25rem); position: relative; isolation: isolate; overflow: hidden; }
     /* Scenes with pinned content must not clip (prevents pin "stick" feel). */
     .section.scene-pin { overflow: visible; }
-    @media (min-width: 640px) { .section { padding-block: 4.5rem; } }
-    @media (min-width: 1024px) { .section { padding-block: 5.5rem; } }
     /* Keep actual content above the ambient accents. */
     .section > .container { position: relative; z-index: 1; }
 
@@ -462,6 +465,13 @@ function injectUtilityClasses() {
       min-width: 0;
       max-width: 25rem;
     }
+    /* Give the carousel more room on xl+ so it doesn't look small inside a
+       72rem container on 1440p/ultrawide. Still capped so cards stay readable. */
+    @media (min-width: 1280px) {
+      .strengths-carousel__slot { max-width: 24rem; }
+      .strengths-carousel__center-col { max-width: 27rem; }
+      .strengths-carousel__viewport { --strength-gap: 1.1rem; --strength-overlap: 1.35rem; }
+    }
     .strengths-carousel__peek-slot {
       position: absolute;
       inset: 0;
@@ -612,9 +622,10 @@ function injectUtilityClasses() {
       }
     }
 
-    .h2 { position: relative; font-size: 1.35rem; line-height: 1.75rem; font-weight: 600; letter-spacing: -0.015em; }
-    @media (min-width: 640px) { .h2 { font-size: 1.75rem; line-height: 2.15rem; } }
-    @media (min-width: 1024px) { .h2 { font-size: 1.95rem; line-height: 2.35rem; } }
+    /* Section headings: single clamp() so size scales fluidly from iPhone SE
+       (~1.4rem) through MacBook (~2rem) up to ultrawide (~2.5rem) without
+       the old 1.35 -> 1.75 -> 1.95 step jumps at 640/1024. */
+    .h2 { position: relative; font-size: clamp(1.4rem, 1.08rem + 1.35vw, 2.5rem); line-height: 1.18; font-weight: 600; letter-spacing: -0.018em; }
     /* Subtle accent bar that draws in when the heading scrolls into view. */
     .h2.reveal::after { content: ""; display: block; margin-top: .6rem; height: 2px; width: 0;
       background: linear-gradient(90deg, #2A9D8F, rgba(42,157,143,0)); border-radius: 9999px;
@@ -634,14 +645,21 @@ function injectUtilityClasses() {
     html[data-motion="off"] .chip:hover { transform: none; }
 
     /* ---------- Brand identity block (navbar left) ---------- */
-    .brand { min-height: 44px; padding: .25rem .35rem; transition: transform .15s ease; }
+    /* min-width: 0 + truncating children means the brand block can shrink
+       without pushing the menu button off-screen on 320–360px Androids
+       (and the long subtitle never wraps the header into 2 lines). */
+    .brand { min-height: 44px; padding: .25rem .35rem; min-width: 0; transition: transform .15s ease; }
     .brand:hover { transform: translateY(-1px); }
     html[data-motion="off"] .brand { transition: none; }
     html[data-motion="off"] .brand:hover { transform: none; }
 
-    .brand-text { display: grid; line-height: 1.05; }
-    .brand-name { font-size: .92rem; font-weight: 700; letter-spacing: -0.015em; color: #E6EDF3; }
-    .brand-sub { margin-top: .12rem; font-size: .72rem; color: rgba(174,185,198,.95); letter-spacing: .01em; }
+    .brand-text { display: grid; line-height: 1.05; min-width: 0; }
+    .brand-name { font-size: .92rem; font-weight: 700; letter-spacing: -0.015em; color: #E6EDF3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-sub { margin-top: .12rem; font-size: .72rem; color: rgba(174,185,198,.95); letter-spacing: .01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Tiny phones: drop the sub-tagline entirely so the brand never crowds the burger. */
+    @media (max-width: 360px) { .brand-sub { display: none; } }
 
     .brand-badge { position: relative; width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center;
       background: radial-gradient(circle at 30% 25%, rgba(49,208,195,.35), rgba(42,157,143,.18) 40%, rgba(8,18,32,.55) 72%),
@@ -850,8 +868,10 @@ function injectUtilityClasses() {
       box-shadow: inset 0 1px 0 rgba(255,255,255,.045), var(--elev-1);
       transition: border-color .2s ease, background .2s ease; }
     .card:hover { border-color: var(--border-mid); background: var(--surface-2); }
-    .card-title { font-weight: 600; color: var(--text-hi); letter-spacing: -0.01em; }
-    .card-body { margin-top: .5rem; color: var(--text-lo); font-size: .95rem; line-height: 1.55rem; }
+    .card-title { font-weight: 600; color: var(--text-hi); letter-spacing: -0.01em;
+      font-size: clamp(1rem, 0.95rem + 0.2vw, 1.1rem); }
+    .card-body { margin-top: .55rem; color: var(--text-lo);
+      font-size: clamp(.9rem, 0.85rem + 0.2vw, 1.02rem); line-height: 1.6; }
 
     .pill { display:inline-flex; align-items: center; border-radius: 9999px; padding: .4rem .8rem; font-size: .8rem; font-weight: 500;
       border: 1px solid var(--border-soft); color: var(--text-md); background: var(--surface-1);
@@ -912,8 +932,9 @@ function injectUtilityClasses() {
     .pcard-kicker { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
     .pcard-arrow { font-size: 1.05rem; color: var(--text-muted); transform: translateX(0); transition: transform .22s ease, color .22s ease; }
     .pcard:hover .pcard-arrow { transform: translateX(4px); color: var(--accent-200); }
-    .pcard-title { font-size: 1.12rem; line-height: 1.35; font-weight: 600; letter-spacing: -0.018em; color: var(--text-hi); }
-    .pcard-body { font-size: .93rem; line-height: 1.55rem; color: var(--text-md); }
+    .pcard-title { font-size: clamp(1.02rem, 0.92rem + 0.45vw, 1.22rem); line-height: 1.32;
+      font-weight: 600; letter-spacing: -0.018em; color: var(--text-hi); }
+    .pcard-body { font-size: clamp(.9rem, 0.85rem + 0.2vw, 1.02rem); line-height: 1.55; color: var(--text-md); }
     .pcard-meta { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem .9rem; margin-top: auto;
       padding-top: .75rem; border-top: 1px solid var(--border-soft); }
     .pcard-meta dt { font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
@@ -929,23 +950,33 @@ function injectUtilityClasses() {
     .pmodal-backdrop { position: absolute; inset: 0; background: rgba(6, 10, 16, .70); backdrop-filter: blur(6px);
       opacity: 0; transition: opacity .2s ease; }
     .pmodal.is-open .pmodal-backdrop { opacity: 1; }
+    /* Flex column so the close button can use position: sticky to stay pinned
+       to the top of the scroll viewport. Reduced top padding compensates for
+       the button now occupying a real row at the top of the flow. */
     .pmodal-panel { position: relative; z-index: 1; width: min(52rem, calc(100vw - 2rem));
       max-height: calc(100vh - 2rem); overflow-y: auto; margin: 1rem auto; top: 50%; transform: translateY(-50%) scale(.98);
       border-radius: var(--r-xl); border: 1px solid var(--border-mid);
       background: linear-gradient(180deg, rgba(22, 30, 40, .98), rgba(14, 20, 28, .98));
-      color: var(--text-hi); padding: 1.75rem 1.75rem 1.85rem;
+      color: var(--text-hi); padding: .85rem 1.75rem 1.85rem;
+      display: flex; flex-direction: column;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--elev-3);
       opacity: 0; transition: opacity .22s ease, transform .22s ease; outline: none; }
     .pmodal.is-open .pmodal-panel { opacity: 1; transform: translateY(-50%) scale(1); }
-    @media (min-width: 640px) { .pmodal-panel { padding: 1.75rem 1.85rem 2rem; } }
-    .pmodal-close { position: absolute; top: .75rem; right: .75rem; width: 2.5rem; height: 2.5rem; min-height: 2.75rem; min-width: 2.75rem; border-radius: 9999px;
+    @media (min-width: 640px) { .pmodal-panel { padding: 1rem 1.85rem 2rem; } }
+    /* Sticky so the X stays visible no matter how far the user scrolls inside
+       the modal — this was the actual mobile bug: an absolutely-positioned
+       close button inside an overflow:auto container scrolls away with content. */
+    .pmodal-close { position: sticky; top: .5rem; align-self: flex-end; flex-shrink: 0;
+      width: 2.5rem; height: 2.5rem; min-height: 2.75rem; min-width: 2.75rem; border-radius: 9999px;
       display: inline-flex; align-items: center; justify-content: center;
-      border: 1px solid var(--border-mid); background: var(--surface-2); color: var(--text-hi);
-      font-size: 1.25rem; line-height: 1; cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(8, 12, 18, 0.72); color: var(--text-hi);
+      font-size: 1.45rem; line-height: 1; cursor: pointer; z-index: 5;
+      backdrop-filter: blur(6px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 6px 14px -6px rgba(0,0,0,.45);
       transition: background .15s ease, border-color .15s ease, transform .15s ease; }
-    .pmodal-close:hover { background: var(--surface-3); border-color: var(--border-accent); transform: rotate(90deg); }
-    .pmodal-close:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 3px; background: rgba(42,157,143,.18); }
+    .pmodal-close:hover { background: rgba(42,157,143,.32); border-color: var(--border-accent); transform: rotate(90deg); }
+    .pmodal-close:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 3px; background: rgba(42,157,143,.28); }
     html[data-motion="off"] .pmodal-close { transition: none; }
     html[data-motion="off"] .pmodal-close:hover { transform: none; }
     .pmodal-kicker { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
@@ -1075,11 +1106,12 @@ function injectUtilityClasses() {
     .case-kicker { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
     .case-arrow { font-size: 1rem; color: var(--text-muted); transition: transform .2s ease, color .2s ease; }
     .case-card:hover .case-arrow { transform: translateX(3px); color: var(--accent-200); }
-    .case-title { margin-top: .25rem; font-size: 1.12rem; line-height: 1.35; font-weight: 600; letter-spacing: -0.018em; color: var(--text-hi); }
+    .case-title { margin-top: .25rem; font-size: clamp(1.02rem, 0.92rem + 0.45vw, 1.22rem); line-height: 1.32;
+      font-weight: 600; letter-spacing: -0.018em; color: var(--text-hi); }
     .case-list { display: grid; gap: .65rem; margin-top: .25rem; }
     .case-list > div { display: grid; grid-template-columns: 7rem 1fr; gap: .75rem; align-items: baseline; }
     .case-list dt { font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
-    .case-list dd { font-size: .93rem; color: var(--text-md); line-height: 1.45rem; }
+    .case-list dd { font-size: clamp(.9rem, 0.85rem + 0.2vw, 1.02rem); color: var(--text-md); line-height: 1.5; }
     .case-tags { display:flex; flex-wrap: wrap; gap: .4rem; margin-top: .25rem; }
     @media (max-width: 640px) {
       .case-list > div { grid-template-columns: 1fr; gap: .15rem; }
@@ -1097,9 +1129,11 @@ function injectUtilityClasses() {
       transition: border-color .2s ease, background .2s ease; }
     .timeline-card:hover { border-color: var(--border-mid); background: var(--surface-2); }
     .timeline-top { display:flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-    .timeline-role { font-weight: 600; color: var(--text-hi); letter-spacing: -0.01em; }
+    .timeline-role { font-weight: 600; color: var(--text-hi); letter-spacing: -0.01em;
+      font-size: clamp(.95rem, 0.9rem + 0.2vw, 1.06rem); }
     .timeline-time { font-size: .8rem; color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .timeline-body { margin-top: .45rem; color: var(--text-md); line-height: 1.55rem; }
+    .timeline-body { margin-top: .5rem; color: var(--text-md);
+      font-size: clamp(.9rem, 0.85rem + 0.2vw, 1.02rem); line-height: 1.6; }
 
     /* Timeline dot: grows in gently when its row enters view, soft hover ring. */
     .timeline-dot { transform: scale(.75); opacity: .7; transition: transform .5s ease .1s, opacity .5s ease .1s, box-shadow .2s ease; }
@@ -1117,8 +1151,13 @@ function injectUtilityClasses() {
       font-size: .82rem; font-weight: 600; letter-spacing: -0.005em; cursor: pointer;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
       transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease; }
-    /* Bump to 44px min on touch-first devices to satisfy WCAG 2.5.5. */
-    @media (hover: none) and (pointer: coarse) { .expandable-toggle { min-height: 2.75rem; } }
+    /* Bump small inline interactives to 44px min on touch-first devices (WCAG 2.5.5).
+       Keeps desktop visual density unchanged. */
+    @media (hover: none) and (pointer: coarse) {
+      .expandable-toggle,
+      .footer-link,
+      .aside-link { min-height: 2.75rem; }
+    }
     .expandable-toggle:hover { background: rgba(42,157,143,.18); border-color: rgba(42,157,143,.5); transform: translateY(-1px); }
     .expandable-toggle:focus-visible { outline: 2px solid #2A9D8F; outline-offset: 3px; }
     .expandable-toggle .caret { display: inline-block; transition: transform .25s ease; }
@@ -1190,7 +1229,10 @@ function injectUtilityClasses() {
     /* Mobile menu slide-in (works alongside Tailwind's .hidden fallback). */
     #mobileMenu { overflow: hidden; max-height: 0; opacity: 0;
       transition: max-height .24s ease, opacity .22s ease; }
-    #mobileMenu[data-open="true"] { max-height: 28rem; opacity: 1; }
+    /* Cap to viewport so landscape phones with short viewports don't clip
+       behind the address bar. Also respect bottom safe-area on notched iPhones. */
+    #mobileMenu[data-open="true"] { max-height: min(28rem, calc(100dvh - 4.5rem)); opacity: 1; }
+    #mobileMenu > div { padding-bottom: max(.75rem, env(safe-area-inset-bottom, .75rem)); }
     html[data-motion="off"] #mobileMenu { transition: none; }
 
     /* ---------- Hero: executive-summary polish ---------- */
@@ -1290,7 +1332,9 @@ function injectUtilityClasses() {
     html[data-motion="off"] .hero-char.is-shown,
     html[data-motion="off"] .hero-char.is-pulsing { animation: none; text-shadow: none; }
 
-    .hero-scroll-hint { position: absolute; left: 50%; bottom: .75rem; transform: translateX(-50%);
+    .hero-scroll-hint { position: absolute; left: 50%;
+      bottom: max(.75rem, env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
       display:flex; flex-direction: column; align-items: center; gap: .4rem; z-index: 5;
       color: rgba(230,237,243,.8); text-decoration: none; }
     .hero-scroll-pill { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
@@ -1402,18 +1446,20 @@ function injectUtilityClasses() {
 
       /* Modal fills the screen more comfortably on small phones */
       .pmodal-panel { width: calc(100vw - 1rem); margin: .5rem auto;
-        max-height: calc(100vh - 1rem); padding: 1.1rem 1rem 1.35rem;
+        max-height: calc(100vh - 1rem); padding: .55rem 1rem 1.35rem;
         border-radius: 1.15rem; top: 50%; }
       .pmodal-grid { gap: .7rem; margin-top: 1rem; }
       .pmodal-grid section { padding: .75rem .85rem; border-radius: .85rem; }
       .pmodal-title { font-size: 1.2rem; }
-      .pmodal-close { top: .45rem; right: .5rem; width: 2.5rem; height: 2.5rem; }
+      /* Sticky close stays pinned to the top of the scroll viewport so the
+         user can always escape, even after scrolling through long content. */
+      .pmodal-close { top: .35rem; width: 2.5rem; height: 2.5rem; }
     }
 
-    /* Very narrow phones: drop heaviest decorations entirely. */
-    @media (max-width: 400px) {
-      h1.text-balance { font-size: 1.55rem !important; }
-    }
+    /* Very narrow phones: keep this slot in case future decorations need it.
+       (Hero H1 size is now governed by clamp() directly on the element, so no
+       override is required here — removing the previous !important rule
+       prevents it from fighting the clamp lower bound.) */
 
     /* ---------- View Transitions (progressive enhancement) ---------- */
     /* In VT-capable browsers, the modal panel's own CSS transition is handed
