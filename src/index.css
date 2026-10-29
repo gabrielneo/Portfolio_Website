@@ -19,10 +19,11 @@ body {
 }
 
 /* One consistent, visible focus ring. */
+/* Outlines follow each element's own rounded corners. (Forcing a pill radius
+   here turned the ring around a whole project card into a lopsided oval.) */
 :focus-visible {
   outline: 2px solid #2dd4bf;
   outline-offset: 3px;
-  border-radius: 9999px;
 }
 button:focus-visible > div,
 a:focus-visible > div {

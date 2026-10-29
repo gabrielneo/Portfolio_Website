@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { ArrowRight, ArrowUp, Check, ChevronRight, Copy, ExternalLink, FileText, Mail, X } from "lucide-react";
+import { ArrowUp, Check, ChevronRight, Copy, ExternalLink, FileText, Mail, X } from "lucide-react";
 import { CONTACT, EXPERIENCE, FOCUS, PROFILE, PROJECTS, STRENGTHS, VALUES, type Project } from "../portfolioData";
 import { useOpenResume } from "./ResumeDialog";
 import { GlassCard, LinkedInIcon, Pill, Section, SectionHeading, SectionLabel, SectionTease, Tag, Takeaway } from "./ui";
@@ -90,7 +90,7 @@ export function Projects() {
               type="button"
               onClick={() => setOpen(project)}
               aria-haspopup="dialog"
-              className="group h-full w-full text-left transition-transform active:scale-[0.99]"
+              className="group h-full w-full rounded-2xl text-left transition-transform active:scale-[0.99]"
             >
               <GlassCard className="flex h-full flex-col gap-3 p-5 transition-all group-hover:-translate-y-1 group-hover:border-accent/40 group-hover:shadow-glow">
                 <div className="flex items-center justify-between gap-3">
@@ -103,7 +103,6 @@ export function Projects() {
                       </span>
                     )}
                   </span>
-                  <ArrowRight className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-accent" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold leading-snug text-white">{project.title}</h3>
                 <p className="text-sm font-medium text-accent-soft">{project.result}</p>
@@ -138,28 +137,52 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
       onClose={onClose}
       onClick={(e) => e.target === e.currentTarget && e.currentTarget.close()}
       aria-labelledby="project-dialog-title"
-      className="m-auto w-[min(52rem,calc(100vw-2rem))] rounded-2xl border border-slate-700/80 bg-slate-950/95 p-0 text-slate-200 shadow-glow backdrop:bg-night/80 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-2xl border border-slate-700/80 bg-slate-950/95 p-0 text-slate-200 shadow-glow backdrop:bg-night/80 backdrop:backdrop-blur-sm"
     >
       {project && (
-        <div className="max-h-[88vh] overflow-y-auto p-6 sm:p-8">
+        <div className="max-h-[88vh] overflow-y-auto p-6 sm:p-7">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{project.kicker}</p>
-              <h2 id="project-dialog-title" className="mt-2 text-2xl font-bold tracking-tight text-white">
+              <h2 id="project-dialog-title" className="mt-1.5 text-xl font-bold tracking-tight text-white sm:text-2xl">
                 {project.title}
               </h2>
-              <p className="mt-3 max-w-prose text-slate-300">{project.detail.desc}</p>
+              <p className="mt-2 text-slate-300">{project.detail.desc}</p>
             </div>
             <button
               type="button"
               onClick={() => ref.current?.close()}
               aria-label="Close project details"
-              className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-200 hover:border-accent/50 hover:text-white"
+              className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-200 hover:border-accent/50 hover:text-white active:scale-95"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+
+          {/* Links first, so they're visible without scrolling. */}
+          {project.detail.links && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {project.detail.links.map((link, i) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all active:scale-95 ${
+                    i === 0
+                      ? "bg-accent text-night shadow-glow hover:-translate-y-0.5"
+                      : "border border-slate-700/80 bg-slate-900/60 text-white hover:border-accent/50"
+                  }`}
+                >
+                  {link.label}
+                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <DetailBlock title="Problem">
               <p>{project.detail.problem}</p>
             </DetailBlock>
@@ -169,35 +192,14 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
             <DetailBlock title={project.detail.doneLabel}>
               <BulletList items={project.detail.done} />
             </DetailBlock>
-            <DetailBlock title="Outcomes / impact">
+            <DetailBlock title="Outcomes">
               <BulletList items={project.detail.outcomes} />
             </DetailBlock>
-            <DetailBlock title="Tools & functions" wide>
-              <div className="flex flex-wrap gap-1.5">
-                {project.detail.tools.map((tool) => (
-                  <Tag key={tool}>{tool}</Tag>
-                ))}
-              </div>
-            </DetailBlock>
-            {project.detail.links && (
-              <DetailBlock title="Links" wide>
-                <div className="flex flex-wrap gap-2">
-                  {project.detail.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent-soft hover:bg-accent/20 hover:text-white"
-                    >
-                      {link.label}
-                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span className="sr-only">(opens in a new tab)</span>
-                    </a>
-                  ))}
-                </div>
-              </DetailBlock>
-            )}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-1.5" aria-label="Tools">
+            {project.detail.tools.map((tool) => (
+              <Tag key={tool}>{tool}</Tag>
+            ))}
           </div>
         </div>
       )}
@@ -205,9 +207,9 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
   );
 }
 
-function DetailBlock({ title, wide, children }: { title: string; wide?: boolean; children: React.ReactNode }) {
+function DetailBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className={`rounded-xl border border-slate-800/80 bg-slate-900/60 p-4 text-sm leading-relaxed text-slate-300 ${wide ? "md:col-span-2" : ""}`}>
+    <section className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-4 text-sm leading-relaxed text-slate-300">
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{title}</h3>
       {children}
     </section>
