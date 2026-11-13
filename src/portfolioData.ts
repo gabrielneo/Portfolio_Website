@@ -12,10 +12,10 @@ export const PROFILE = {
   status: "Open to opportunities",
   linkedin: "https://www.linkedin.com/in/neo-yi-kai/",
   resume:
-    "https://docs.google.com/document/d/1f-cBuO7EeRGkGYEXADQ0GE0NOvRGuuAa/edit?usp=sharing&ouid=100361167613814497616&rtpof=true&sd=true",
+    "https://docs.google.com/document/d/1nSYTwqPM1rMyk9VSeb2mpCQR8JmbjXfo/edit?usp=drive_link&ouid=100361167613814497616&rtpof=true&sd=true",
   // In-page preview and PDF download of the same Google Docs resume.
-  resumePreview: "https://drive.google.com/file/d/1f-cBuO7EeRGkGYEXADQ0GE0NOvRGuuAa/preview",
-  resumePdf: "https://docs.google.com/document/d/1f-cBuO7EeRGkGYEXADQ0GE0NOvRGuuAa/export?format=pdf",
+  resumePreview: "https://drive.google.com/file/d/1nSYTwqPM1rMyk9VSeb2mpCQR8JmbjXfo/preview",
+  resumePdf: "https://docs.google.com/document/d/1nSYTwqPM1rMyk9VSeb2mpCQR8JmbjXfo/export?format=pdf",
   github: "https://github.com/gabrielneo",
 };
 
@@ -107,6 +107,38 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
   {
+    id: "sg-care-capacity",
+    kicker: "Healthcare analytics",
+    title: "SG Care Capacity: ED bed waits + senior clinic access",
+    result: "BA case study + weekly verified data pipeline, live",
+    live: true,
+    tags: ["Python", "DuckDB", "FastAPI", "Next.js"],
+    detail: {
+      desc: "Where do Singapore's emergency departments wait longest for ward beds, and where do seniors have the fewest chronic-care clinics? A tested, weekly-updated pipeline, API and website built on public MOH, data.gov.sg and SingStat data.",
+      problem: "ED bed-wait and senior clinic data is split across MOH, data.gov.sg and SingStat, so planners can't see demand and community care side by side.",
+      role: "Solo: BA case study, data engineering, API, website and testing.",
+      doneLabel: "What I built",
+      done: [
+        "BA case study: stakeholder map, personas, as-is / to-be flow, MoSCoW requirements, success metrics",
+        "Weekly DuckDB pipeline with 79 data-quality checks that block bad releases",
+        "Read-only FastAPI + Next.js site: every number shows its source and “data as of” date",
+        "Postcode search for the nearest polyclinics, GP clinics and EDs",
+      ],
+      outcomes: [
+        "2025 ward-bed waits ranged 2.5–6.2 hours across hospitals",
+        "Chronic-care clinics per 1,000 seniors ranged 0–5.02 across 32 planning areas",
+        "1,000+ automated tests incl. WCAG 2.1 AA and Lighthouse budgets",
+        "Independent audit: 20 random numbers traced back to raw source cells",
+      ],
+      tools: ["Python", "DuckDB", "SQL", "pandas", "FastAPI", "Next.js", "TypeScript", "Leaflet", "GitHub Actions", "Render", "Vercel"],
+      links: [
+        { label: "Visit the live site", href: "https://sg-care-capacity-web.vercel.app/" },
+        { label: "Read the case study", href: "https://sg-care-capacity-web.vercel.app/case-study" },
+        { label: "View code on GitHub", href: "https://github.com/gabrielneo/sg-care-capacity" },
+      ],
+    },
+  },
+  {
     id: "fieldnotes",
     kicker: "Personal build",
     title: "Fieldnotes: saved food videos → a map of places",
@@ -119,8 +151,9 @@ export const PROJECTS: Project[] = [
       role: "Solo: product, UX, engineering, security and docs.",
       doneLabel: "What I built",
       done: [
-        "Caption scraping → AI extraction → strict validation",
-        "Works with any AI provider (Claude, GPT, Gemini or local)",
+        "Up to 50 links per batch → a searchable, filterable list of places",
+        "Works across 9 AI providers, including free local models",
+        "LLM pipeline structures each caption into a 7-field schema, validated with Zod",
         "Google Maps lookup with My Maps and Excel export",
       ],
       outcomes: [

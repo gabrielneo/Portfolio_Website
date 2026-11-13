@@ -70,7 +70,7 @@ export function Strengths() {
           </li>
         ))}
       </ul>
-      <SectionTease to="projects" label="Projects" payoff="AI product build, governance, ERP data, QA" />
+      <SectionTease to="projects" label="Projects" payoff="Healthcare analytics, AI product build, governance, ERP, QA" />
     </Section>
   );
 }
