@@ -120,7 +120,7 @@ export const PROJECTS: Project[] = [
       doneLabel: "What I built",
       done: [
         "BA case study: stakeholder map, personas, as-is / to-be flow, MoSCoW requirements, success metrics",
-        "Weekly DuckDB pipeline with 79 data-quality checks that block bad releases",
+        "Weekly DuckDB pipeline with 87 data-quality checks that block bad releases",
         "Read-only FastAPI + Next.js site: every number shows its source and “data as of” date",
         "Postcode search for the nearest polyclinics, GP clinics and EDs",
       ],
