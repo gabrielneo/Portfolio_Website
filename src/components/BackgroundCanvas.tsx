@@ -48,7 +48,12 @@ export default function BackgroundCanvas() {
   const [mode, setMode] = useState<Mode | null>(null);
 
   useEffect(() => {
-    setMode(detectBackgroundMode());
+    // The 3D scene (three.js, ~240 KB gzipped) is decoration: it starts only once the browser is idle, so the text, fonts and
+    // photo come first. The static gradient mesh shows until then.
+    const start = () => setMode(detectBackgroundMode());
+    // Safari has no requestIdleCallback: a short timer instead.
+    const hasIdle = typeof window.requestIdleCallback === "function";
+    const idle = hasIdle ? window.requestIdleCallback(start, { timeout: 2500 }) : setTimeout(start, 1200);
 
     const onMove = (e: PointerEvent) => {
       input.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -69,6 +74,8 @@ export default function BackgroundCanvas() {
     document.addEventListener("pointerleave", onLeave);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
+      if (hasIdle) window.cancelIdleCallback(idle as number);
+      else clearTimeout(idle);
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll);

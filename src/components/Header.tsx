@@ -8,6 +8,10 @@ const NAV_IDS = NAV.map((item) => item.id);
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  // The overlay is portalled into <body>, which only exists in the browser: it mounts after hydration (it starts closed and
+  // hidden, so nothing changes on screen), and the pre-rendered HTML (scripts/prerender.mjs) matches the first client render.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const active = useActiveSection(NAV_IDS);
   const progress = useScrollProgress();
 
@@ -40,7 +44,7 @@ export default function Header() {
       <nav aria-label="Main" className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <a href="#top" className="flex min-w-0 items-center gap-3 rounded-xl" aria-label={`${PROFILE.name}, back to top`}>
           <img
-            src={`${import.meta.env.BASE_URL}avatar.jpg`}
+            src="./avatar.jpg" // relative: the same in the pre-rendered HTML and the browser build (both under /Portfolio_Website/)
             alt=""
             width={40}
             height={40}
@@ -81,7 +85,7 @@ export default function Header() {
       {/* Full-screen mobile overlay, rendered into <body>: the header's backdrop blur
           would otherwise become its containing block and squash it to header height.
           Stays mounted so it can fade/slide; inert while closed. */}
-      {createPortal(
+      {mounted && createPortal(
       <div
         id="mobile-menu"
         inert={!menuOpen}

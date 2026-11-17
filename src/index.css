@@ -5,7 +5,16 @@
 html {
   background: #0b0f19;
   color-scheme: dark;
+}
+/* Smooth in-page scrolling, switched on only after the page has loaded (usePageEffects): a link such as #projects then lands on its
+   section at once instead of gliding down from the top. */
+html.smooth-scroll {
   scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.smooth-scroll {
+    scroll-behavior: auto;
+  }
 }
 /* Only <html> carries the background colour: a body background would paint
    over the fixed constellation canvas behind the page. */

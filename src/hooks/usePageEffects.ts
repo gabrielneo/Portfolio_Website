@@ -49,13 +49,24 @@ export function useScrollProgress() {
 
 /**
  * Fades [data-reveal] elements in as they scroll into view. Content is visible
- * by default; the hidden starting state only applies once this has run, and
- * never with reduced motion.
+ * by default (and in the pre-rendered HTML); the hidden starting state only
+ * applies once this has run, never with reduced motion, and never to anything
+ * already on screen or above it: a visitor never sees content vanish and fade
+ * back in after the page has loaded, wherever they landed (#projects included).
  */
 export function useScrollReveal() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // A link to a section (#projects): go there now. The pre-rendered HTML normally lets the browser do it; this covers `npm run dev`.
+    const target = window.location.hash.length > 1 ? document.getElementById(decodeURIComponent(window.location.hash.slice(1))) : null;
+    if (target && window.scrollY === 0 && target.getBoundingClientRect().top > window.innerHeight / 2) target.scrollIntoView({ block: "start" });
+    // From here on, in-page links glide (index.css); the landing jump above and the browser's own are instant.
+    const smooth = requestAnimationFrame(() => document.documentElement.classList.add("smooth-scroll"));
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => cancelAnimationFrame(smooth);
     const root = document.documentElement;
+    document.querySelectorAll("[data-reveal]").forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight) el.setAttribute("data-shown", "");
+    });
     root.classList.add("js-reveal");
     const observer = new IntersectionObserver(
       (entries) => {
@@ -68,8 +79,9 @@ export function useScrollReveal() {
       },
       { rootMargin: "0px 0px -8% 0px" }
     );
-    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+    document.querySelectorAll("[data-reveal]:not([data-shown])").forEach((el) => observer.observe(el));
     return () => {
+      cancelAnimationFrame(smooth);
       observer.disconnect();
       root.classList.remove("js-reveal");
     };

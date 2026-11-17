@@ -18,7 +18,7 @@ itself.
 ```bash
 npm install
 npm run dev        # http://localhost:5173/
-npm run build      # production build in dist/
+npm run build      # production build in dist/, pre-rendered to static HTML
 npm run preview    # serve the production build
 ```
 
@@ -45,3 +45,7 @@ and set **Source** to **GitHub Actions**.
 - Fonts are bundled with the site; the only third-party request is the resume
   preview, on demand.
 - Builds use relative paths, so `dist/` works from any folder or URL.
+- The page is pre-rendered at build time (`src/entry-server.tsx`, `scripts/prerender.mjs`): `dist/index.html` carries the
+  full content, so it shows before any JavaScript runs and links such as `#projects` land on their section. The browser
+  then hydrates it (`src/main.tsx`). Anything that needs `window` or `document` must run in an effect, not during render.
+- The 3D background loads only once the browser is idle; the Inter Latin font file is preloaded.

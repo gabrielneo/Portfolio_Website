@@ -5,3 +5,6 @@ dist
 .env
 .env.*
 !.env.example
+
+# Server build used only by scripts/prerender.mjs (deleted after the build)
+.ssr
