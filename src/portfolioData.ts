@@ -109,7 +109,7 @@ export const PROJECTS: Project[] = [
   {
     id: "sg-care-capacity",
     kicker: "Healthcare analytics",
-    title: "SG Care Capacity: ED bed waits + senior clinic access",
+    title: "Care-pacity: ED bed waits + senior clinic access",
     result: "BA case study + weekly verified data pipeline, live",
     live: true,
     tags: ["Python", "DuckDB", "FastAPI", "Next.js"],
